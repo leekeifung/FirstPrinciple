@@ -1,0 +1,4258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>AMA1702 Calculus — First Principle Explorer</title>
+
+  <meta
+    name="description"
+    content="Interactive AMA1702 Calculus learning activity for secant lines, tangent lines, first-principle differentiation and one-sided derivatives."
+  >
+
+  <style>
+    :root {
+      --poly-red: #a6192e;
+      --primary: #1e3a8a;
+      --primary-light: #dbeafe;
+      --function: #3157b7;
+      --left: #0284c7;
+      --right: #e11d48;
+      --secant: #f59e0b;
+      --tangent: #059669;
+      --derivative: #7c3aed;
+
+      --ink: #172033;
+      --muted: #64748b;
+      --soft: #f5f7fb;
+      --panel: #ffffff;
+      --border: #dce3ed;
+      --plot-bg: #ffffff;
+      --grid: #e8edf4;
+
+      --good-bg: #ecfdf5;
+      --good-border: #86efac;
+      --good-ink: #166534;
+
+      --warn-bg: #fff7ed;
+      --warn-border: #fdba74;
+      --warn-ink: #9a3412;
+
+      --info-bg: #eff6ff;
+      --info-border: #93c5fd;
+      --info-ink: #1e40af;
+
+      --shadow: 0 8px 30px rgba(15, 23, 42, 0.08);
+      --radius: 16px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top right, #eaf1ff 0, transparent 28rem),
+        var(--soft);
+      font-family:
+        Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", sans-serif;
+      line-height: 1.55;
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    button,
+    select,
+    input[type="range"],
+    input[type="checkbox"] {
+      cursor: pointer;
+    }
+
+    button:focus-visible,
+    select:focus-visible,
+    input:focus-visible {
+      outline: 3px solid rgba(37, 99, 235, 0.28);
+      outline-offset: 2px;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    .site-header {
+      color: white;
+      background:
+        linear-gradient(125deg, rgba(166, 25, 46, 0.97), rgba(30, 58, 138, 0.96)),
+        #1e3a8a;
+      padding: 42px 24px 36px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .site-header::after {
+      content: "";
+      position: absolute;
+      width: 330px;
+      height: 330px;
+      right: -80px;
+      top: -130px;
+      border: 50px solid rgba(255, 255, 255, 0.08);
+      border-radius: 50%;
+    }
+
+    .header-inner {
+      width: min(1240px, 100%);
+      margin: auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    .eyebrow {
+      margin-bottom: 8px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      opacity: 0.9;
+    }
+
+    h1 {
+      margin: 0;
+      max-width: 900px;
+      font-size: clamp(2rem, 5vw, 3.6rem);
+      line-height: 1.12;
+    }
+
+    .header-description {
+      max-width: 860px;
+      margin: 15px 0 20px;
+      font-size: clamp(1rem, 2vw, 1.22rem);
+      opacity: 0.94;
+    }
+
+    .lecturer {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      font-weight: 650;
+    }
+
+    .header-badge {
+      padding: 5px 10px;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.1);
+      font-size: 0.88rem;
+    }
+
+    .page-shell {
+      width: min(1240px, calc(100% - 28px));
+      margin: 0 auto 55px;
+    }
+
+    .principle-banner {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 18px;
+      align-items: center;
+      margin: -18px auto 22px;
+      padding: 20px 22px;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      position: relative;
+      z-index: 3;
+    }
+
+    .principle-label {
+      color: white;
+      background: var(--primary);
+      padding: 7px 12px;
+      border-radius: 999px;
+      font-weight: 750;
+      white-space: nowrap;
+    }
+
+    .principle-equation {
+      font-family: "Cambria Math", Cambria, Georgia, serif;
+      font-size: clamp(1.1rem, 3vw, 1.45rem);
+      overflow-x: auto;
+    }
+
+    .task-tabs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin: 22px 0;
+      padding: 7px;
+      background: #e8edf5;
+      border-radius: 14px;
+      position: sticky;
+      top: 8px;
+      z-index: 10;
+      box-shadow: 0 5px 20px rgba(15, 23, 42, 0.08);
+    }
+
+    .task-tab {
+      min-height: 52px;
+      padding: 9px 13px;
+      color: #475569;
+      background: transparent;
+      border: 0;
+      border-radius: 10px;
+      font-weight: 750;
+      transition: 160ms ease;
+    }
+
+    .task-tab:hover {
+      color: var(--primary);
+      background: rgba(255, 255, 255, 0.7);
+    }
+
+    .task-tab.active {
+      color: white;
+      background: linear-gradient(120deg, var(--primary), #3157b7);
+      box-shadow: 0 4px 13px rgba(30, 58, 138, 0.25);
+    }
+
+    .task-panel {
+      display: none;
+    }
+
+    .task-panel.active {
+      display: block;
+      animation: panel-in 240ms ease;
+    }
+
+    @keyframes panel-in {
+      from {
+        opacity: 0;
+        transform: translateY(5px);
+      }
+
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    .section-heading {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      align-items: flex-start;
+      margin: 28px 0 17px;
+    }
+
+    .section-heading h2 {
+      margin: 0 0 6px;
+      color: var(--primary);
+      font-size: clamp(1.55rem, 4vw, 2.25rem);
+    }
+
+    .section-heading p {
+      max-width: 850px;
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .task-number {
+      min-width: 54px;
+      height: 54px;
+      display: grid;
+      place-items: center;
+      color: white;
+      background: var(--poly-red);
+      border-radius: 15px;
+      font-size: 1.25rem;
+      font-weight: 800;
+    }
+
+    .try-this {
+      margin-bottom: 18px;
+      padding: 13px 16px;
+      color: #334155;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-left: 5px solid var(--secant);
+      border-radius: 10px;
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: minmax(275px, 0.75fr) minmax(0, 2fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .control-card,
+    .plot-card,
+    .readout-card,
+    .table-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .control-card {
+      padding: 20px;
+      position: sticky;
+      top: 82px;
+    }
+
+    .control-card h3,
+    .plot-card h3,
+    .readout-card h3,
+    .table-card h3 {
+      margin: 0 0 12px;
+      color: #263653;
+    }
+
+    .control-group {
+      margin-bottom: 19px;
+    }
+
+    .control-group:last-child {
+      margin-bottom: 0;
+    }
+
+    .control-label {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 7px;
+      color: #334155;
+      font-size: 0.93rem;
+      font-weight: 720;
+    }
+
+    .control-value {
+      color: var(--primary);
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-weight: 750;
+    }
+
+    select {
+      width: 100%;
+      min-height: 43px;
+      padding: 8px 10px;
+      color: var(--ink);
+      background: white;
+      border: 1px solid #cbd5e1;
+      border-radius: 9px;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--primary);
+    }
+
+    input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--primary);
+    }
+
+    .checkbox-row {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      margin: 10px 0;
+      color: #334155;
+    }
+
+    .segmented {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 6px;
+    }
+
+    .segmented.four {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .segment-button {
+      min-height: 39px;
+      padding: 7px 9px;
+      color: #475569;
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 0.86rem;
+      font-weight: 700;
+    }
+
+    .segment-button:hover {
+      border-color: #93a4ba;
+      background: #f1f5f9;
+    }
+
+    .segment-button.active {
+      color: white;
+      background: var(--primary);
+      border-color: var(--primary);
+    }
+
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .action-button {
+      flex: 1 1 auto;
+      min-height: 41px;
+      padding: 8px 12px;
+      color: white;
+      background: var(--primary);
+      border: 1px solid var(--primary);
+      border-radius: 9px;
+      font-weight: 720;
+    }
+
+    .action-button:hover {
+      filter: brightness(1.08);
+    }
+
+    .action-button.secondary {
+      color: var(--primary);
+      background: white;
+    }
+
+    .action-button.danger {
+      color: #9f1239;
+      background: #fff1f2;
+      border-color: #fecdd3;
+    }
+
+    .visual-stack {
+      min-width: 0;
+      display: grid;
+      gap: 16px;
+    }
+
+    .plot-card {
+      min-width: 0;
+      padding: 15px;
+    }
+
+    .plot-heading {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+      padding: 0 5px;
+    }
+
+    .plot-heading p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    .interactive-plot {
+      display: block;
+      width: 100%;
+      aspect-ratio: 760 / 430;
+      min-height: 260px;
+      touch-action: none;
+      user-select: none;
+    }
+
+    .plot-grid,
+    .plot-axis,
+    .plot-tick,
+    .plot-label,
+    .plot-curve,
+    .plot-line {
+      pointer-events: none;
+    }
+
+    .plot-surface {
+      cursor: crosshair;
+      pointer-events: all;
+    }
+
+    .plot-point {
+      pointer-events: none;
+    }
+
+    .plot-point.draggable {
+      pointer-events: all;
+      cursor: grab;
+    }
+
+    .plot-point.draggable:active {
+      cursor: grabbing;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px 16px;
+      margin: 7px 7px 1px;
+      color: #475569;
+      font-size: 0.84rem;
+    }
+
+    .legend-item {
+      display: inline-flex;
+      gap: 7px;
+      align-items: center;
+    }
+
+    .legend-line {
+      width: 24px;
+      border-top: 3px solid currentColor;
+    }
+
+    .legend-line.dashed {
+      border-top-style: dashed;
+    }
+
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    .readout-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .readout-card,
+    .table-card {
+      padding: 18px;
+    }
+
+    .equation {
+      overflow-x: auto;
+      margin: 8px 0;
+      padding: 10px 12px;
+      color: #172554;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 9px;
+      font-family: "Cambria Math", Cambria, Georgia, serif;
+      font-size: 1.06rem;
+    }
+
+    .big-equation {
+      color: var(--primary);
+      font-family: "Cambria Math", Cambria, Georgia, serif;
+      font-size: clamp(1.08rem, 3vw, 1.33rem);
+      font-weight: 700;
+    }
+
+    .status-box {
+      min-height: 100%;
+      padding: 14px;
+      border: 1px solid;
+      border-radius: 11px;
+    }
+
+    .status-box strong {
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    .status-box.good {
+      color: var(--good-ink);
+      background: var(--good-bg);
+      border-color: var(--good-border);
+    }
+
+    .status-box.warn {
+      color: var(--warn-ink);
+      background: var(--warn-bg);
+      border-color: var(--warn-border);
+    }
+
+    .status-box.info {
+      color: var(--info-ink);
+      background: var(--info-bg);
+      border-color: var(--info-border);
+    }
+
+    .definition-list {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 6px 13px;
+      margin: 12px 0 0;
+      font-size: 0.94rem;
+    }
+
+    .definition-list dt {
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .definition-list dd {
+      margin: 0;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+
+    .table-card {
+      margin-top: 16px;
+    }
+
+    .table-scroll {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.92rem;
+    }
+
+    th,
+    td {
+      padding: 9px 11px;
+      text-align: right;
+      border-bottom: 1px solid #e2e8f0;
+      white-space: nowrap;
+    }
+
+    th {
+      color: #334155;
+      background: #f8fafc;
+    }
+
+    th:first-child,
+    td:first-child {
+      text-align: left;
+    }
+
+    .graph-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .slope-visual {
+      display: grid;
+      grid-template-columns: 100px 1fr;
+      gap: 16px;
+      align-items: center;
+      margin-top: 12px;
+    }
+
+    .slope-gauge {
+      width: 98px;
+      height: 98px;
+      display: grid;
+      place-items: center;
+      background:
+        linear-gradient(#cbd5e1, #cbd5e1) center / 82% 1px no-repeat,
+        linear-gradient(90deg, #cbd5e1, #cbd5e1) center / 1px 82% no-repeat,
+        #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-radius: 50%;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .slope-needle {
+      width: 78px;
+      height: 5px;
+      background: var(--tangent);
+      border-radius: 999px;
+      transform-origin: center;
+      transition: transform 100ms linear, opacity 150ms ease;
+    }
+
+    .slope-gauge.undefined .slope-needle {
+      opacity: 0.12;
+    }
+
+    .slope-gauge::after {
+      content: "";
+      width: 11px;
+      height: 11px;
+      background: var(--ink);
+      border: 3px solid white;
+      border-radius: 50%;
+      position: absolute;
+    }
+
+    .piecewise-formula {
+      display: grid;
+      grid-template-columns: auto auto 1fr;
+      gap: 8px;
+      align-items: center;
+      padding: 12px;
+      overflow-x: auto;
+      color: #172554;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 9px;
+      font-family: "Cambria Math", Cambria, Georgia, serif;
+      font-size: 1.04rem;
+    }
+
+    .piecewise-formula .brace {
+      font-size: 3.3rem;
+      line-height: 1;
+      transform: scaleX(0.72);
+    }
+
+    .piecewise-cases {
+      display: grid;
+      gap: 4px;
+      min-width: max-content;
+    }
+
+    .custom-panel {
+      padding: 13px;
+      background: #f8fafc;
+      border: 1px solid #dbe3ed;
+      border-radius: 10px;
+    }
+
+    .small-note {
+      color: var(--muted);
+      font-size: 0.86rem;
+    }
+
+    .site-footer {
+      padding: 28px 20px 40px;
+      color: #64748b;
+      text-align: center;
+    }
+
+    .site-footer strong {
+      color: #334155;
+    }
+
+    @media (max-width: 960px) {
+      .workspace {
+        grid-template-columns: 1fr;
+      }
+
+      .control-card {
+        position: static;
+      }
+
+      .graph-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 680px) {
+      .site-header {
+        padding: 32px 18px 30px;
+      }
+
+      .page-shell {
+        width: min(100% - 18px, 1240px);
+      }
+
+      .principle-banner {
+        grid-template-columns: 1fr;
+      }
+
+      .principle-label {
+        width: max-content;
+      }
+
+      .task-tabs {
+        position: static;
+        grid-template-columns: 1fr;
+      }
+
+      .task-tab {
+        min-height: 44px;
+      }
+
+      .readout-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .section-heading {
+        flex-direction: column-reverse;
+      }
+
+      .task-number {
+        width: 46px;
+        min-width: 46px;
+        height: 46px;
+      }
+
+      .control-card,
+      .plot-card,
+      .readout-card,
+      .table-card {
+        border-radius: 12px;
+      }
+
+      .interactive-plot {
+        min-height: 230px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    @media print {
+      .task-tabs,
+      .control-card button {
+        display: none !important;
+      }
+
+      .task-panel {
+        display: block !important;
+        break-before: page;
+      }
+
+      .workspace {
+        grid-template-columns: 1fr;
+      }
+
+      .control-card {
+        position: static;
+      }
+
+      body {
+        background: white;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="eyebrow">
+        The Hong Kong Polytechnic University · AMA1702 Calculus
+      </div>
+
+      <h1>Secants, Tangents and the First Principle</h1>
+
+      <p class="header-description">
+        An interactive companion to Lecture Notes 4. Move points, compare
+        one-sided limits, construct tangent lines and discover derivative curves.
+      </p>
+
+      <div class="lecturer">
+        <span>Dr. LEE Kei Fung, Charles</span>
+        <span class="header-badge">PolyU AMA</span>
+        <span class="header-badge">Angles are in radians</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="page-shell">
+    <section class="principle-banner" aria-label="First principle of differentiation">
+      <div class="principle-label">First principle</div>
+
+      <div class="principle-equation">
+        f′(a) =
+        lim<sub>h→0</sub>
+        [f(a+h) − f(a)] / h
+      </div>
+    </section>
+
+    <nav class="task-tabs" role="tablist" aria-label="Interactive calculus tasks">
+      <button
+        type="button"
+        class="task-tab active"
+        role="tab"
+        aria-selected="true"
+        aria-controls="task1"
+        data-target="task1"
+      >
+        Task 1 · Secant and limit
+      </button>
+
+      <button
+        type="button"
+        class="task-tab"
+        role="tab"
+        aria-selected="false"
+        aria-controls="task2"
+        data-target="task2"
+      >
+        Task 2 · Build f′(x)
+      </button>
+
+      <button
+        type="button"
+        class="task-tab"
+        role="tab"
+        aria-selected="false"
+        aria-controls="task3"
+        data-target="task3"
+      >
+        Task 3 · Piecewise functions
+      </button>
+    </nav>
+
+    <!-- =========================================================
+         TASK 1
+    ========================================================== -->
+    <section id="task1" class="task-panel active" role="tabpanel">
+      <div class="section-heading">
+        <div>
+          <h2>Task 1 — From a secant line to a tangent line</h2>
+          <p>
+            Choose a function and two points on its graph. Observe how the
+            secant slope approaches a limiting value as Q approaches P from
+            the left, from the right, or from both sides.
+          </p>
+        </div>
+
+        <div class="task-number">1</div>
+      </div>
+
+      <div class="try-this">
+        <strong>Suggested investigation:</strong>
+        First try <em>f(x)=x²</em> at <em>a=2</em>. Then choose
+        <em>f(x)=|x|</em>, set <em>a=0</em>, and compare the two sides.
+      </div>
+
+      <div class="workspace">
+        <aside class="control-card">
+          <h3>Controls</h3>
+
+          <div class="control-group">
+            <label class="control-label" for="t1Function">
+              Basic function
+            </label>
+            <select id="t1Function"></select>
+          </div>
+
+          <div class="control-group">
+            <div class="control-label">Exploration mode</div>
+
+            <div class="segmented four" id="t1Mode">
+              <button type="button" class="segment-button active" data-mode="free">
+                Two points
+              </button>
+              <button type="button" class="segment-button" data-mode="left">
+                Left h→0⁻
+              </button>
+              <button type="button" class="segment-button" data-mode="right">
+                Right h→0⁺
+              </button>
+              <button type="button" class="segment-button" data-mode="both">
+                Both sides
+              </button>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label class="control-label" for="t1A">
+              <span>Base point P: x = a</span>
+              <output id="t1AValue" class="control-value"></output>
+            </label>
+            <input id="t1A" type="range">
+          </div>
+
+          <div id="t1BGroup" class="control-group">
+            <label class="control-label" for="t1B">
+              <span>Second point Q: x = b</span>
+              <output id="t1BValue" class="control-value"></output>
+            </label>
+            <input id="t1B" type="range">
+          </div>
+
+          <div id="t1ActiveGroup" class="control-group">
+            <div class="control-label">A graph click moves</div>
+
+            <div class="segmented" id="t1ActivePoint">
+              <button type="button" class="segment-button" data-point="p">
+                Point P
+              </button>
+              <button type="button" class="segment-button active" data-point="q">
+                Point Q
+              </button>
+            </div>
+          </div>
+
+          <div id="t1HGroup" class="control-group" hidden>
+            <label class="control-label" for="t1H">
+              <span>Distance |h| from P</span>
+              <output id="t1HValue" class="control-value"></output>
+            </label>
+            <input id="t1H" type="range">
+            <div class="small-note">
+              This is a logarithmic control, so small values of h are easier to explore.
+            </div>
+          </div>
+
+          <div class="button-row">
+            <button id="t1Closer" type="button" class="action-button secondary">
+              Move Q halfway
+            </button>
+
+            <button id="t1Animate" type="button" class="action-button">
+              Animate Q → P
+            </button>
+
+            <button id="t1Reset" type="button" class="action-button danger">
+              Reset
+            </button>
+          </div>
+        </aside>
+
+        <div class="visual-stack">
+          <article class="plot-card">
+            <div class="plot-heading">
+              <h3>Curve and secant line</h3>
+              <p>Drag P or Q, or click the graph.</p>
+            </div>
+
+            <svg
+              id="t1Plot"
+              class="interactive-plot"
+              viewBox="0 0 760 430"
+              role="img"
+              aria-label="Interactive secant line graph"
+            ></svg>
+
+            <div class="legend">
+              <span class="legend-item" style="color: var(--function)">
+                <span class="legend-line"></span> f(x)
+              </span>
+
+              <span class="legend-item" style="color: var(--left)">
+                <span class="legend-line dashed"></span> Left secant
+              </span>
+
+              <span class="legend-item" style="color: var(--right)">
+                <span class="legend-line dashed"></span> Right secant
+              </span>
+
+              <span class="legend-item" style="color: var(--tangent)">
+                <span class="legend-line"></span> Limiting tangent
+              </span>
+            </div>
+          </article>
+
+          <div class="readout-grid">
+            <article class="readout-card">
+              <h3>Difference quotient</h3>
+              <div id="t1Formula" aria-live="polite"></div>
+            </article>
+
+            <article class="readout-card">
+              <h3>Limit conclusion</h3>
+              <div id="t1Status" aria-live="polite"></div>
+            </article>
+          </div>
+        </div>
+      </div>
+
+      <article class="table-card">
+        <h3>Numerical approach from both sides</h3>
+        <p class="small-note">
+          For the left side, h is negative. For the right side, h is positive.
+        </p>
+
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>|h|</th>
+                <th>Left quotient, h&lt;0</th>
+                <th>Right quotient, h&gt;0</th>
+              </tr>
+            </thead>
+            <tbody id="t1TableBody"></tbody>
+          </table>
+        </div>
+      </article>
+    </section>
+
+    <!-- =========================================================
+         TASK 2
+    ========================================================== -->
+    <section id="task2" class="task-panel" role="tabpanel">
+      <div class="section-heading">
+        <div>
+          <h2>Task 2 — Discover and construct the derivative curve</h2>
+          <p>
+            Move the tangent point along f. The tangent slope becomes the
+            vertical coordinate f′(a) on the derivative graph. Collected
+            slope-points gradually form the graph of f′.
+          </p>
+        </div>
+
+        <div class="task-number">2</div>
+      </div>
+
+      <div class="try-this">
+        <strong>Suggested investigation:</strong>
+        Choose <em>f(x)=x²</em>, move the tangent point from left to right,
+        and predict the shape of <em>f′(x)</em> before revealing the answer.
+      </div>
+
+      <div class="workspace">
+        <aside class="control-card">
+          <h3>Controls</h3>
+
+          <div class="control-group">
+            <label class="control-label" for="t2Function">
+              Basic function
+            </label>
+            <select id="t2Function"></select>
+          </div>
+
+          <div class="control-group">
+            <label class="control-label" for="t2A">
+              <span>Tangent point: x = a</span>
+              <output id="t2AValue" class="control-value"></output>
+            </label>
+            <input id="t2A" type="range">
+          </div>
+
+          <div class="control-group">
+            <div class="control-label">Finite difference direction</div>
+
+            <div class="segmented" id="t2Side">
+              <button type="button" class="segment-button" data-sign="-1">
+                h&lt;0
+              </button>
+              <button type="button" class="segment-button active" data-sign="1">
+                h&gt;0
+              </button>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label class="control-label" for="t2H">
+              <span>|h| in the first principle</span>
+              <output id="t2HValue" class="control-value"></output>
+            </label>
+            <input id="t2H" type="range">
+          </div>
+
+          <div class="control-group">
+            <label class="checkbox-row">
+              <input id="t2Collect" type="checkbox" checked>
+              <span>Collect the point (a, f′(a)) while I move the tangent.</span>
+            </label>
+
+            <label class="checkbox-row">
+              <input id="t2ShowAnswer" type="checkbox">
+              <span>Show the complete theoretical derivative curve.</span>
+            </label>
+          </div>
+
+          <div class="button-row">
+            <button id="t2Trace" type="button" class="action-button">
+              Auto-trace derivative
+            </button>
+
+            <button id="t2Clear" type="button" class="action-button secondary">
+              Clear collected points
+            </button>
+
+            <button id="t2Reset" type="button" class="action-button danger">
+              Reset
+            </button>
+          </div>
+        </aside>
+
+        <div class="visual-stack">
+          <div class="graph-grid">
+            <article class="plot-card">
+              <div class="plot-heading">
+                <h3>Original function f(x)</h3>
+                <p>Drag anywhere horizontally.</p>
+              </div>
+
+              <svg
+                id="t2MainPlot"
+                class="interactive-plot"
+                viewBox="0 0 760 430"
+                role="img"
+                aria-label="Function and tangent graph"
+              ></svg>
+
+              <div class="legend">
+                <span class="legend-item" style="color: var(--function)">
+                  <span class="legend-line"></span> f(x)
+                </span>
+
+                <span class="legend-item" style="color: var(--secant)">
+                  <span class="legend-line dashed"></span> Finite secant
+                </span>
+
+                <span class="legend-item" style="color: var(--tangent)">
+                  <span class="legend-line"></span> Tangent
+                </span>
+              </div>
+            </article>
+
+            <article class="plot-card">
+              <div class="plot-heading">
+                <h3>Derivative graph f′(x)</h3>
+                <p>Each tangent slope produces one point.</p>
+              </div>
+
+              <svg
+                id="t2DerivativePlot"
+                class="interactive-plot"
+                viewBox="0 0 760 430"
+                role="img"
+                aria-label="Collected derivative graph"
+              ></svg>
+
+              <div class="legend">
+                <span class="legend-item" style="color: var(--derivative)">
+                  <span class="legend-dot"></span> Collected slope-points
+                </span>
+
+                <span class="legend-item" style="color: var(--tangent)">
+                  <span class="legend-line"></span> Theoretical f′(x)
+                </span>
+              </div>
+            </article>
+          </div>
+
+          <div class="readout-grid">
+            <article class="readout-card">
+              <h3>First-principle calculation</h3>
+              <div id="t2Formula" aria-live="polite"></div>
+            </article>
+
+            <article class="readout-card">
+              <h3>Slope and derivative result</h3>
+
+              <div class="slope-visual">
+                <div id="t2Gauge" class="slope-gauge">
+                  <div id="t2Needle" class="slope-needle"></div>
+                </div>
+
+                <div>
+                  <div id="t2DerivativeFormula" class="big-equation"></div>
+                  <div id="t2Values"></div>
+                  <div id="t2Count" class="small-note"></div>
+                </div>
+              </div>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================
+         TASK 3
+    ========================================================== -->
+    <section id="task3" class="task-panel" role="tabpanel">
+      <div class="section-heading">
+        <div>
+          <h2>Task 3 — Left-hand and right-hand derivatives</h2>
+          <p>
+            At a joining point c, a derivative exists only when the function
+            is continuous and the left-hand and right-hand derivatives agree.
+          </p>
+        </div>
+
+        <div class="task-number">3</div>
+      </div>
+
+      <div class="try-this">
+        <strong>Suggested investigation:</strong>
+        Compare the smooth join with the corner. Then use the custom slope
+        laboratory and press <em>Match the slopes</em>.
+      </div>
+
+      <div class="workspace">
+        <aside class="control-card">
+          <h3>Piecewise controls</h3>
+
+          <div class="control-group">
+            <label class="control-label" for="t3Piece">
+              Piecewise example
+            </label>
+
+            <select id="t3Piece">
+              <option value="smooth">1. Smooth join — derivative exists</option>
+              <option value="corner">2. Corner — derivatives disagree</option>
+              <option value="jump">3. Jump — not continuous</option>
+              <option value="custom">4. Build your own joined lines</option>
+            </select>
+          </div>
+
+          <div id="t3CustomPanel" class="custom-panel control-group" hidden>
+            <div class="control-group">
+              <label class="control-label" for="t3ML">
+                <span>Left slope m<sub>L</sub></span>
+                <output id="t3MLValue" class="control-value"></output>
+              </label>
+              <input id="t3ML" type="range" min="-4" max="4" step="0.1" value="-1">
+            </div>
+
+            <div class="control-group">
+              <label class="control-label" for="t3MR">
+                <span>Right slope m<sub>R</sub></span>
+                <output id="t3MRValue" class="control-value"></output>
+              </label>
+              <input id="t3MR" type="range" min="-4" max="4" step="0.1" value="2">
+            </div>
+
+            <button id="t3Match" type="button" class="action-button secondary">
+              Match the slopes
+            </button>
+          </div>
+
+          <div class="control-group">
+            <label class="control-label" for="t3H">
+              <span>Distance of Q<sub>−</sub> and Q<sub>+</sub>: |h|</span>
+              <output id="t3HValue" class="control-value"></output>
+            </label>
+
+            <input id="t3H" type="range">
+
+            <div class="small-note">
+              Click or drag on the graph to change |h|.
+            </div>
+          </div>
+
+          <div class="button-row">
+            <button id="t3Closer" type="button" class="action-button secondary">
+              Halve |h|
+            </button>
+
+            <button id="t3Animate" type="button" class="action-button">
+              Animate h → 0
+            </button>
+
+            <button id="t3Reset" type="button" class="action-button danger">
+              Reset
+            </button>
+          </div>
+        </aside>
+
+        <div class="visual-stack">
+          <article class="plot-card">
+            <div class="plot-heading">
+              <h3>One-sided secant lines at the joining point</h3>
+              <p>Blue approaches from the left; red approaches from the right.</p>
+            </div>
+
+            <svg
+              id="t3Plot"
+              class="interactive-plot"
+              viewBox="0 0 760 430"
+              role="img"
+              aria-label="Piecewise one-sided derivative graph"
+            ></svg>
+
+            <div class="legend">
+              <span class="legend-item" style="color: var(--left)">
+                <span class="legend-line"></span> Left branch
+              </span>
+
+              <span class="legend-item" style="color: var(--right)">
+                <span class="legend-line"></span> Right branch
+              </span>
+
+              <span class="legend-item" style="color: var(--left)">
+                <span class="legend-line dashed"></span> Left secant
+              </span>
+
+              <span class="legend-item" style="color: var(--right)">
+                <span class="legend-line dashed"></span> Right secant
+              </span>
+            </div>
+          </article>
+
+          <div class="readout-grid">
+            <article class="readout-card">
+              <h3>Piecewise definition and quotients</h3>
+              <div id="t3Formula"></div>
+              <div id="t3Quotients" aria-live="polite"></div>
+            </article>
+
+            <article class="readout-card">
+              <h3>Differentiability test</h3>
+              <div id="t3Status" aria-live="polite"></div>
+            </article>
+          </div>
+        </div>
+      </div>
+
+      <article class="table-card">
+        <h3>One-sided derivative table</h3>
+
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>r = |h|</th>
+                <th>[f(c−r)−f(c)]/(−r)</th>
+                <th>[f(c+r)−f(c)]/r</th>
+              </tr>
+            </thead>
+            <tbody id="t3TableBody"></tbody>
+          </table>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <strong>AMA1702 Calculus</strong> · Interactive Lecture Notes 4<br>
+    Dr. LEE Kei Fung, Charles · The Hong Kong Polytechnic University
+  </footer>
+
+  <noscript>
+    This activity requires JavaScript to display the interactive graphs.
+  </noscript>
+
+  <script>
+    "use strict";
+
+    /* ============================================================
+       GENERAL UTILITIES
+    ============================================================ */
+
+    const byId = id => document.getElementById(id);
+
+    const clamp = (value, minimum, maximum) =>
+      Math.min(maximum, Math.max(minimum, value));
+
+    const isFiniteNumber = value => Number.isFinite(value);
+
+    function formatNumber(value, digits = 5) {
+      if (Number.isNaN(value)) return "undefined";
+      if (value === Infinity) return "+∞";
+      if (value === -Infinity) return "−∞";
+      if (!Number.isFinite(value)) return "undefined";
+
+      if (Math.abs(value) < 1e-11) return "0";
+
+      if (Math.abs(value) >= 100000 || Math.abs(value) < 0.0001) {
+        return value
+          .toExponential(3)
+          .replace("e+", " × 10^")
+          .replace("e-", " × 10^−");
+      }
+
+      return Number(value.toFixed(digits)).toString().replace("-", "−");
+    }
+
+    function formatTick(value) {
+      if (Math.abs(value) < 1e-10) return "0";
+
+      const absolute = Math.abs(value);
+
+      if (absolute >= 10000 || absolute < 0.001) {
+        return value.toExponential(1);
+      }
+
+      const digits =
+        absolute < 1 ? 2 :
+        absolute < 10 ? 1 : 0;
+
+      return Number(value.toFixed(digits)).toString().replace("-", "−");
+    }
+
+    function escapeXML(text) {
+      return String(text)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;");
+    }
+
+    function approximatelyEqual(a, b, tolerance = 1e-6) {
+      if (!Number.isFinite(a) || !Number.isFinite(b)) return false;
+      return Math.abs(a - b) <= tolerance * (1 + Math.max(Math.abs(a), Math.abs(b)));
+    }
+
+    function setStatus(element, type, heading, body) {
+      element.className = `status-box ${type}`;
+      element.innerHTML = `
+        <strong>${heading}</strong>
+        <div>${body}</div>
+      `;
+    }
+
+    function niceStep(range, targetTicks = 8) {
+      const rough = range / targetTicks;
+      const power = Math.pow(10, Math.floor(Math.log10(rough)));
+      const fraction = rough / power;
+
+      let niceFraction;
+
+      if (fraction <= 1) niceFraction = 1;
+      else if (fraction <= 2) niceFraction = 2;
+      else if (fraction <= 5) niceFraction = 5;
+      else niceFraction = 10;
+
+      return niceFraction * power;
+    }
+
+    function makeTicks(minimum, maximum, targetTicks = 8) {
+      const step = niceStep(maximum - minimum, targetTicks);
+      const first = Math.ceil((minimum - 1e-12) / step) * step;
+      const values = [];
+
+      for (let value = first; value <= maximum + step * 0.2; value += step) {
+        values.push(Number(value.toPrecision(12)));
+      }
+
+      return values;
+    }
+
+    function configureLinearSlider(input, minimum, maximum, value) {
+      input.min = minimum;
+      input.max = maximum;
+      input.step = (maximum - minimum) / 1000;
+      input.value = clamp(value, minimum, maximum);
+    }
+
+    function configureLogSlider(input, minimumH, maximumH, value) {
+      const safeMinimum = Math.max(minimumH, 1e-8);
+      const safeMaximum = Math.max(maximumH, safeMinimum * 10);
+
+      input.min = Math.log10(safeMinimum);
+      input.max = Math.log10(safeMaximum);
+      input.step = 0.01;
+      input.value = Math.log10(clamp(value, safeMinimum, safeMaximum));
+    }
+
+    function logSliderValue(input) {
+      return Math.pow(10, Number(input.value));
+    }
+
+    function differenceQuotient(functionEntry, a, h) {
+      if (!Number.isFinite(h) || Math.abs(h) < 1e-14) return NaN;
+
+      const fa = functionEntry.f(a);
+      const fb = functionEntry.f(a + h);
+
+      if (!Number.isFinite(fa) || !Number.isFinite(fb)) return NaN;
+
+      return (fb - fa) / h;
+    }
+
+    function sideDerivativeEstimate(functionEntry, a, direction) {
+      const range = functionEntry.xMax - functionEntry.xMin;
+
+      const available =
+        direction < 0
+          ? a - functionEntry.xMin
+          : functionEntry.xMax - a;
+
+      if (available <= range * 1e-10) {
+        return {
+          available: false,
+          value: NaN,
+          h: NaN
+        };
+      }
+
+      const hMagnitude = Math.min(range * 1e-5, available * 0.1);
+      const h = direction * hMagnitude;
+
+      return {
+        available: true,
+        value: differenceQuotient(functionEntry, a, h),
+        h
+      };
+    }
+
+    const prefersReducedMotion =
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    /* ============================================================
+       FUNCTION LIBRARY
+
+       To add another function, add an object to this array.
+    ============================================================ */
+
+    const FUNCTIONS = [
+      {
+        id: "square",
+        name: "Quadratic",
+        formulaText: "f(x) = x²",
+        formulaHTML: "f(x) = x<sup>2</sup>",
+        derivativeHTML: "f′(x) = 2x",
+        f: x => x * x,
+        df: x => 2 * x,
+        xMin: -4,
+        xMax: 4,
+        yMin: -3,
+        yMax: 18,
+        dyMin: -10,
+        dyMax: 10,
+        defaultA: 1,
+        defaultB: 2,
+        defaultH: 0.8
+      },
+      {
+        id: "cube",
+        name: "Cubic",
+        formulaText: "f(x) = x³",
+        formulaHTML: "f(x) = x<sup>3</sup>",
+        derivativeHTML: "f′(x) = 3x<sup>2</sup>",
+        f: x => x * x * x,
+        df: x => 3 * x * x,
+        xMin: -2.5,
+        xMax: 2.5,
+        yMin: -17,
+        yMax: 17,
+        dyMin: -2,
+        dyMax: 21,
+        defaultA: 1,
+        defaultB: 1.8,
+        defaultH: 0.6
+      },
+      {
+        id: "sin",
+        name: "Sine",
+        formulaText: "f(x) = sin x",
+        formulaHTML: "f(x) = sin x",
+        derivativeHTML: "f′(x) = cos x",
+        f: x => Math.sin(x),
+        df: x => Math.cos(x),
+        xMin: -2 * Math.PI,
+        xMax: 2 * Math.PI,
+        yMin: -2,
+        yMax: 2,
+        dyMin: -1.6,
+        dyMax: 1.6,
+        defaultA: Math.PI / 4,
+        defaultB: Math.PI / 4 + 1,
+        defaultH: 0.8
+      },
+      {
+        id: "cos",
+        name: "Cosine",
+        formulaText: "f(x) = cos x",
+        formulaHTML: "f(x) = cos x",
+        derivativeHTML: "f′(x) = −sin x",
+        f: x => Math.cos(x),
+        df: x => -Math.sin(x),
+        xMin: -2 * Math.PI,
+        xMax: 2 * Math.PI,
+        yMin: -2,
+        yMax: 2,
+        dyMin: -1.6,
+        dyMax: 1.6,
+        defaultA: Math.PI / 4,
+        defaultB: Math.PI / 4 + 1,
+        defaultH: 0.8
+      },
+      {
+        id: "tan",
+        name: "Tangent",
+        formulaText: "f(x) = tan x",
+        formulaHTML: "f(x) = tan x",
+        derivativeHTML: "f′(x) = sec<sup>2</sup>x",
+        f: x => Math.tan(x),
+        df: x => 1 / Math.pow(Math.cos(x), 2),
+        xMin: -1.25,
+        xMax: 1.25,
+        yMin: -4,
+        yMax: 4,
+        dyMin: -1,
+        dyMax: 12,
+        defaultA: 0.4,
+        defaultB: 0.9,
+        defaultH: 0.35
+      },
+      {
+        id: "exp",
+        name: "Exponential",
+        formulaText: "f(x) = eˣ",
+        formulaHTML: "f(x) = e<sup>x</sup>",
+        derivativeHTML: "f′(x) = e<sup>x</sup>",
+        f: x => Math.exp(x),
+        df: x => Math.exp(x),
+        xMin: -3,
+        xMax: 3,
+        yMin: -2,
+        yMax: 22,
+        dyMin: -2,
+        dyMax: 22,
+        defaultA: 0,
+        defaultB: 1,
+        defaultH: 0.7
+      },
+      {
+        id: "ln",
+        name: "Natural logarithm",
+        formulaText: "f(x) = ln x",
+        formulaHTML: "f(x) = ln x",
+        derivativeHTML: "f′(x) = 1/x",
+        f: x => x > 0 ? Math.log(x) : NaN,
+        df: x => x > 0 ? 1 / x : NaN,
+        xMin: 0.2,
+        xMax: 6,
+        yMin: -2.5,
+        yMax: 2.5,
+        dyMin: -0.5,
+        dyMax: 5.8,
+        defaultA: 1,
+        defaultB: 2,
+        defaultH: 0.6
+      },
+      {
+        id: "sqrt",
+        name: "Square root",
+        formulaText: "f(x) = √x",
+        formulaHTML: "f(x) = √x",
+        derivativeHTML: "f′(x) = 1/(2√x)",
+        f: x => x >= 0 ? Math.sqrt(x) : NaN,
+        df: x => x > 0 ? 1 / (2 * Math.sqrt(x)) : NaN,
+        xMin: 0.05,
+        xMax: 9,
+        yMin: -1,
+        yMax: 4,
+        dyMin: -0.3,
+        dyMax: 2.6,
+        defaultA: 1,
+        defaultB: 3,
+        defaultH: 0.8
+      },
+      {
+        id: "abs",
+        name: "Absolute value",
+        formulaText: "f(x) = |x|",
+        formulaHTML: "f(x) = |x|",
+        derivativeHTML:
+          "f′(x) = −1 for x&lt;0; 1 for x&gt;0; undefined at x=0",
+        f: x => Math.abs(x),
+        df: x => x < 0 ? -1 : x > 0 ? 1 : NaN,
+        xMin: -4,
+        xMax: 4,
+        yMin: -2,
+        yMax: 5,
+        dyMin: -2,
+        dyMax: 2,
+        defaultA: 0,
+        defaultB: 2,
+        defaultH: 0.8
+      }
+    ];
+
+    function getFunctionEntry(id) {
+      return FUNCTIONS.find(entry => entry.id === id);
+    }
+
+    /* ============================================================
+       SVG PLOT CLASS
+    ============================================================ */
+
+    let plotCounter = 0;
+
+    class SVGPlot {
+      constructor(svg) {
+        this.svg = svg;
+
+        this.width = 760;
+        this.height = 430;
+
+        this.margin = {
+          left: 62,
+          right: 20,
+          top: 24,
+          bottom: 52
+        };
+
+        this.clipId = `plot-clip-${++plotCounter}`;
+
+        this.setBounds(-5, 5, -5, 5);
+      }
+
+      setBounds(xMin, xMax, yMin, yMax) {
+        this.xMin = xMin;
+        this.xMax = xMax;
+        this.yMin = yMin;
+        this.yMax = yMax;
+
+        this.plotWidth = this.width - this.margin.left - this.margin.right;
+        this.plotHeight = this.height - this.margin.top - this.margin.bottom;
+      }
+
+      sx(x) {
+        return (
+          this.margin.left +
+          ((x - this.xMin) / (this.xMax - this.xMin)) * this.plotWidth
+        );
+      }
+
+      sy(y) {
+        return (
+          this.margin.top +
+          ((this.yMax - y) / (this.yMax - this.yMin)) * this.plotHeight
+        );
+      }
+
+      eventToX(event) {
+        const rect = this.svg.getBoundingClientRect();
+
+        const viewX =
+          ((event.clientX - rect.left) / rect.width) * this.width;
+
+        const x =
+          this.xMin +
+          ((viewX - this.margin.left) / this.plotWidth) *
+          (this.xMax - this.xMin);
+
+        return clamp(x, this.xMin, this.xMax);
+      }
+
+      baseMarkup() {
+        const xTicks = makeTicks(this.xMin, this.xMax, 9);
+        const yTicks = makeTicks(this.yMin, this.yMax, 7);
+
+        let markup = `
+          <defs>
+            <clipPath id="${this.clipId}">
+              <rect
+                x="${this.margin.left}"
+                y="${this.margin.top}"
+                width="${this.plotWidth}"
+                height="${this.plotHeight}"
+              ></rect>
+            </clipPath>
+          </defs>
+
+          <rect
+            class="plot-surface"
+            data-surface="true"
+            x="${this.margin.left}"
+            y="${this.margin.top}"
+            width="${this.plotWidth}"
+            height="${this.plotHeight}"
+            rx="8"
+            fill="#ffffff"
+            stroke="#cbd5e1"
+            stroke-width="1.2"
+          ></rect>
+        `;
+
+        for (const tick of xTicks) {
+          const x = this.sx(tick);
+
+          markup += `
+            <line
+              class="plot-grid"
+              x1="${x}" y1="${this.margin.top}"
+              x2="${x}" y2="${this.margin.top + this.plotHeight}"
+              stroke="#e8edf4"
+              stroke-width="1"
+            ></line>
+
+            <text
+              class="plot-tick"
+              x="${x}"
+              y="${this.margin.top + this.plotHeight + 23}"
+              fill="#64748b"
+              font-size="12"
+              text-anchor="middle"
+            >${escapeXML(formatTick(tick))}</text>
+          `;
+        }
+
+        for (const tick of yTicks) {
+          const y = this.sy(tick);
+
+          markup += `
+            <line
+              class="plot-grid"
+              x1="${this.margin.left}" y1="${y}"
+              x2="${this.margin.left + this.plotWidth}" y2="${y}"
+              stroke="#e8edf4"
+              stroke-width="1"
+            ></line>
+
+            <text
+              class="plot-tick"
+              x="${this.margin.left - 9}"
+              y="${y + 4}"
+              fill="#64748b"
+              font-size="12"
+              text-anchor="end"
+            >${escapeXML(formatTick(tick))}</text>
+          `;
+        }
+
+        if (this.xMin <= 0 && this.xMax >= 0) {
+          const x0 = this.sx(0);
+
+          markup += `
+            <line
+              class="plot-axis"
+              x1="${x0}" y1="${this.margin.top}"
+              x2="${x0}" y2="${this.margin.top + this.plotHeight}"
+              stroke="#64748b"
+              stroke-width="1.4"
+            ></line>
+          `;
+        }
+
+        if (this.yMin <= 0 && this.yMax >= 0) {
+          const y0 = this.sy(0);
+
+          markup += `
+            <line
+              class="plot-axis"
+              x1="${this.margin.left}" y1="${y0}"
+              x2="${this.margin.left + this.plotWidth}" y2="${y0}"
+              stroke="#64748b"
+              stroke-width="1.4"
+            ></line>
+          `;
+        }
+
+        markup += `
+          <text
+            class="plot-label"
+            x="${this.margin.left + this.plotWidth - 3}"
+            y="${this.height - 11}"
+            fill="#334155"
+            font-size="15"
+            font-weight="700"
+            text-anchor="end"
+          >x</text>
+
+          <text
+            class="plot-label"
+            x="20"
+            y="${this.margin.top + 8}"
+            fill="#334155"
+            font-size="15"
+            font-weight="700"
+          >y</text>
+        `;
+
+        return markup;
+      }
+
+      render(layers, accessibleTitle = "Interactive graph") {
+        this.svg.setAttribute("aria-label", accessibleTitle);
+
+        this.svg.innerHTML = `
+          ${this.baseMarkup()}
+          <g clip-path="url(#${this.clipId})">
+            ${layers.join("")}
+          </g>
+        `;
+      }
+
+      curve(fn, options = {}) {
+        const from = options.from ?? this.xMin;
+        const to = options.to ?? this.xMax;
+        const samples = options.samples ?? 700;
+        const color = options.color ?? "#3157b7";
+        const width = options.width ?? 3;
+        const dash = options.dash ?? "";
+        const opacity = options.opacity ?? 1;
+
+        const yRange = this.yMax - this.yMin;
+        let path = "";
+        let drawing = false;
+        let previousY = null;
+
+        for (let i = 0; i <= samples; i++) {
+          const x = from + ((to - from) * i) / samples;
+
+          let y;
+
+          try {
+            y = fn(x);
+          } catch {
+            y = NaN;
+          }
+
+          const valid =
+            Number.isFinite(y) &&
+            y > this.yMin - 5 * yRange &&
+            y < this.yMax + 5 * yRange;
+
+          if (!valid) {
+            drawing = false;
+            previousY = null;
+            continue;
+          }
+
+          if (
+            previousY !== null &&
+            Math.abs(y - previousY) > yRange * 1.1
+          ) {
+            drawing = false;
+          }
+
+          const command = drawing ? "L" : "M";
+
+          path += `${command}${this.sx(x).toFixed(2)},${this.sy(y).toFixed(2)} `;
+
+          drawing = true;
+          previousY = y;
+        }
+
+        return `
+          <path
+            class="plot-curve"
+            d="${path}"
+            fill="none"
+            stroke="${color}"
+            stroke-width="${width}"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-dasharray="${dash}"
+            opacity="${opacity}"
+            vector-effect="non-scaling-stroke"
+          ></path>
+        `;
+      }
+
+      lineThrough(x0, y0, slope, options = {}) {
+        if (!Number.isFinite(slope)) return "";
+
+        const color = options.color ?? "#059669";
+        const width = options.width ?? 2.5;
+        const dash = options.dash ?? "";
+        const opacity = options.opacity ?? 1;
+
+        const y1 = y0 + slope * (this.xMin - x0);
+        const y2 = y0 + slope * (this.xMax - x0);
+
+        return `
+          <line
+            class="plot-line"
+            x1="${this.sx(this.xMin)}"
+            y1="${this.sy(y1)}"
+            x2="${this.sx(this.xMax)}"
+            y2="${this.sy(y2)}"
+            stroke="${color}"
+            stroke-width="${width}"
+            stroke-dasharray="${dash}"
+            opacity="${opacity}"
+            vector-effect="non-scaling-stroke"
+          ></line>
+        `;
+      }
+
+      segment(x1, y1, x2, y2, options = {}) {
+        if (![x1, y1, x2, y2].every(Number.isFinite)) return "";
+
+        return `
+          <line
+            class="plot-line"
+            x1="${this.sx(x1)}"
+            y1="${this.sy(y1)}"
+            x2="${this.sx(x2)}"
+            y2="${this.sy(y2)}"
+            stroke="${options.color ?? "#64748b"}"
+            stroke-width="${options.width ?? 2.5}"
+            stroke-dasharray="${options.dash ?? ""}"
+            opacity="${options.opacity ?? 1}"
+            vector-effect="non-scaling-stroke"
+          ></line>
+        `;
+      }
+
+      point(x, y, options = {}) {
+        if (!Number.isFinite(x) || !Number.isFinite(y)) return "";
+
+        const color = options.color ?? "#172033";
+        const radius = options.radius ?? 6;
+        const label = options.label ?? "";
+        const handle = options.handle ?? "";
+        const open = options.open ?? false;
+        const title = options.title ?? "";
+
+        const fill = open ? "#ffffff" : color;
+        const stroke = open ? color : "#ffffff";
+        const strokeWidth = open ? 3 : 2.2;
+
+        return `
+          <g>
+            <circle
+              class="plot-point ${handle ? "draggable" : ""}"
+              ${handle ? `data-handle="${escapeXML(handle)}"` : ""}
+              cx="${this.sx(x)}"
+              cy="${this.sy(y)}"
+              r="${radius}"
+              fill="${fill}"
+              stroke="${stroke}"
+              stroke-width="${strokeWidth}"
+              vector-effect="non-scaling-stroke"
+            >
+              ${title ? `<title>${escapeXML(title)}</title>` : ""}
+            </circle>
+
+            ${
+              label
+                ? `
+                  <text
+                    class="plot-label"
+                    x="${this.sx(x) + 10}"
+                    y="${this.sy(y) - 10}"
+                    fill="${color}"
+                    font-size="14"
+                    font-weight="800"
+                  >${escapeXML(label)}</text>
+                `
+                : ""
+            }
+          </g>
+        `;
+      }
+
+      polyline(points, options = {}) {
+        if (!points.length) return "";
+
+        const color = options.color ?? "#7c3aed";
+        const width = options.width ?? 2.2;
+        const opacity = options.opacity ?? 0.85;
+        const maxDx = options.maxDx ?? Infinity;
+        const maxDy = options.maxDy ?? Infinity;
+
+        let path = "";
+        let previous = null;
+
+        for (const point of points) {
+          if (!Number.isFinite(point.x) || !Number.isFinite(point.y)) {
+            previous = null;
+            continue;
+          }
+
+          const shouldBreak =
+            previous &&
+            (
+              Math.abs(point.x - previous.x) > maxDx ||
+              Math.abs(point.y - previous.y) > maxDy
+            );
+
+          const command = !previous || shouldBreak ? "M" : "L";
+
+          path += `${command}${this.sx(point.x).toFixed(2)},${this.sy(point.y).toFixed(2)} `;
+
+          previous = point;
+        }
+
+        return `
+          <path
+            class="plot-curve"
+            d="${path}"
+            fill="none"
+            stroke="${color}"
+            stroke-width="${width}"
+            opacity="${opacity}"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            vector-effect="non-scaling-stroke"
+          ></path>
+        `;
+      }
+    }
+
+    const COLORS = {
+      function: "#3157b7",
+      left: "#0284c7",
+      right: "#e11d48",
+      secant: "#f59e0b",
+      tangent: "#059669",
+      derivative: "#7c3aed",
+      dark: "#172033",
+      grey: "#94a3b8"
+    };
+
+    /* ============================================================
+       POPULATE FUNCTION MENUS
+    ============================================================ */
+
+    for (const select of [byId("t1Function"), byId("t2Function")]) {
+      for (const entry of FUNCTIONS) {
+        const option = document.createElement("option");
+        option.value = entry.id;
+        option.textContent = `${entry.name} — ${entry.formulaText}`;
+        select.appendChild(option);
+      }
+    }
+
+    /* ============================================================
+       TASK 1
+    ============================================================ */
+
+    const task1Plot = new SVGPlot(byId("t1Plot"));
+
+    const task1State = {
+      functionId: "square",
+      mode: "free",
+      a: 1,
+      b: 2,
+      activePoint: "q",
+      animation: null,
+      drag: null
+    };
+
+    function task1Function() {
+      return getFunctionEntry(task1State.functionId);
+    }
+
+    function resetTask1() {
+      stopTask1Animation();
+
+      const fn = task1Function();
+
+      task1State.a = fn.defaultA;
+      task1State.b = fn.defaultB;
+      task1State.mode = "free";
+      task1State.activePoint = "q";
+
+      configureLinearSlider(
+        byId("t1A"),
+        fn.xMin,
+        fn.xMax,
+        task1State.a
+      );
+
+      configureLinearSlider(
+        byId("t1B"),
+        fn.xMin,
+        fn.xMax,
+        task1State.b
+      );
+
+      const range = fn.xMax - fn.xMin;
+
+      configureLogSlider(
+        byId("t1H"),
+        range / 10000,
+        range * 0.42,
+        fn.defaultH
+      );
+
+      renderTask1();
+    }
+
+    function task1RawH() {
+      return logSliderValue(byId("t1H"));
+    }
+
+    function task1SafeH() {
+      const fn = task1Function();
+      const requested = task1RawH();
+
+      let available;
+
+      if (task1State.mode === "left") {
+        available = task1State.a - fn.xMin;
+      } else if (task1State.mode === "right") {
+        available = fn.xMax - task1State.a;
+      } else {
+        available = Math.min(
+          task1State.a - fn.xMin,
+          fn.xMax - task1State.a
+        );
+      }
+
+      if (available <= 1e-12) return 0;
+
+      return Math.min(requested, available * 0.98);
+    }
+
+    function setTask1A(value) {
+      const fn = task1Function();
+      let next = clamp(value, fn.xMin, fn.xMax);
+      const h = task1RawH();
+
+      if (task1State.mode === "left") {
+        next = clamp(next, fn.xMin + h * 1.02, fn.xMax);
+      }
+
+      if (task1State.mode === "right") {
+        next = clamp(next, fn.xMin, fn.xMax - h * 1.02);
+      }
+
+      if (task1State.mode === "both") {
+        next = clamp(
+          next,
+          fn.xMin + h * 1.02,
+          fn.xMax - h * 1.02
+        );
+      }
+
+      task1State.a = next;
+    }
+
+    function setTask1B(value) {
+      const fn = task1Function();
+      task1State.b = clamp(value, fn.xMin, fn.xMax);
+
+      const smallest = (fn.xMax - fn.xMin) / 10000;
+
+      if (Math.abs(task1State.b - task1State.a) < smallest) {
+        const rightCandidate = task1State.a + smallest;
+
+        task1State.b =
+          rightCandidate <= fn.xMax
+            ? rightCandidate
+            : task1State.a - smallest;
+      }
+    }
+
+    function syncTask1Controls() {
+      const fn = task1Function();
+
+      byId("t1A").value = task1State.a;
+      byId("t1B").value = task1State.b;
+
+      byId("t1AValue").textContent = formatNumber(task1State.a, 4);
+      byId("t1BValue").textContent = formatNumber(task1State.b, 4);
+      byId("t1HValue").textContent = formatNumber(task1SafeH(), 5);
+
+      const isFree = task1State.mode === "free";
+
+      byId("t1BGroup").hidden = !isFree;
+      byId("t1ActiveGroup").hidden = !isFree;
+      byId("t1HGroup").hidden = isFree;
+
+      for (const button of byId("t1Mode").querySelectorAll("button")) {
+        button.classList.toggle(
+          "active",
+          button.dataset.mode === task1State.mode
+        );
+      }
+
+      for (const button of byId("t1ActivePoint").querySelectorAll("button")) {
+        button.classList.toggle(
+          "active",
+          button.dataset.point === task1State.activePoint
+        );
+      }
+
+      byId("t1Closer").textContent =
+        isFree ? "Move Q halfway" : "Halve |h|";
+
+      byId("t1Animate").textContent =
+        task1State.animation ? "Stop animation" : "Animate Q → P";
+    }
+
+    function renderTask1Table() {
+      const fn = task1Function();
+      const range = fn.xMax - fn.xMin;
+
+      const magnitudes = [
+        range * 0.1,
+        range * 0.02,
+        range * 0.004,
+        range * 0.0008
+      ];
+
+      const rows = magnitudes.map(magnitude => {
+        const leftAvailable = task1State.a - magnitude >= fn.xMin;
+        const rightAvailable = task1State.a + magnitude <= fn.xMax;
+
+        const left = leftAvailable
+          ? differenceQuotient(fn, task1State.a, -magnitude)
+          : NaN;
+
+        const right = rightAvailable
+          ? differenceQuotient(fn, task1State.a, magnitude)
+          : NaN;
+
+        return `
+          <tr>
+            <td>${formatNumber(magnitude, 6)}</td>
+            <td>${leftAvailable ? formatNumber(left, 7) : "—"}</td>
+            <td>${rightAvailable ? formatNumber(right, 7) : "—"}</td>
+          </tr>
+        `;
+      });
+
+      byId("t1TableBody").innerHTML = rows.join("");
+    }
+
+    function renderTask1Status() {
+      const fn = task1Function();
+      const left = sideDerivativeEstimate(fn, task1State.a, -1);
+      const right = sideDerivativeEstimate(fn, task1State.a, 1);
+
+      if (task1State.mode === "free") {
+        setStatus(
+          byId("t1Status"),
+          "info",
+          "A secant is an average rate of change",
+          `
+            Move Q closer to P. If the secant slopes approach one number,
+            that number is the tangent slope f′(${formatNumber(task1State.a, 4)}).
+          `
+        );
+        return;
+      }
+
+      if (task1State.mode === "left") {
+        if (!left.available) {
+          setStatus(
+            byId("t1Status"),
+            "warn",
+            "No left-side interval is available",
+            "Move P away from the left endpoint of the displayed domain."
+          );
+          return;
+        }
+
+        setStatus(
+          byId("t1Status"),
+          "info",
+          "Left-hand derivative",
+          `
+            The left-hand secant slopes approach approximately
+            <strong>${formatNumber(left.value, 7)}</strong>.
+            A full derivative also requires the right-hand derivative to exist
+            and have the same value.
+          `
+        );
+        return;
+      }
+
+      if (task1State.mode === "right") {
+        if (!right.available) {
+          setStatus(
+            byId("t1Status"),
+            "warn",
+            "No right-side interval is available",
+            "Move P away from the right endpoint of the displayed domain."
+          );
+          return;
+        }
+
+        setStatus(
+          byId("t1Status"),
+          "info",
+          "Right-hand derivative",
+          `
+            The right-hand secant slopes approach approximately
+            <strong>${formatNumber(right.value, 7)}</strong>.
+            A full derivative also requires the left-hand derivative to exist
+            and have the same value.
+          `
+        );
+        return;
+      }
+
+      if (!left.available || !right.available) {
+        setStatus(
+          byId("t1Status"),
+          "warn",
+          "A two-sided comparison is unavailable",
+          "Move P into the interior of the displayed domain."
+        );
+        return;
+      }
+
+      const tolerance =
+        0.003 * (1 + Math.max(Math.abs(left.value), Math.abs(right.value)));
+
+      const agree =
+        Math.abs(left.value - right.value) <= tolerance;
+
+      if (agree) {
+        const exact = fn.df(task1State.a);
+        const derivativeValue = Number.isFinite(exact)
+          ? exact
+          : (left.value + right.value) / 2;
+
+        setStatus(
+          byId("t1Status"),
+          "good",
+          "The two one-sided limits agree",
+          `
+            Left ≈ ${formatNumber(left.value, 7)} and
+            right ≈ ${formatNumber(right.value, 7)}.
+            Therefore, the derivative appears to exist and
+            f′(${formatNumber(task1State.a, 4)}) =
+            <strong>${formatNumber(derivativeValue, 7)}</strong>.
+          `
+        );
+      } else {
+        setStatus(
+          byId("t1Status"),
+          "warn",
+          "The one-sided limits do not agree",
+          `
+            Left ≈ ${formatNumber(left.value, 7)}, but
+            right ≈ ${formatNumber(right.value, 7)}.
+            Therefore, the two-sided derivative does not exist.
+          `
+        );
+      }
+    }
+
+    function renderTask1() {
+      const fn = task1Function();
+
+      syncTask1Controls();
+
+      task1Plot.setBounds(
+        fn.xMin,
+        fn.xMax,
+        fn.yMin,
+        fn.yMax
+      );
+
+      const layers = [
+        task1Plot.curve(fn.f, {
+          color: COLORS.function,
+          width: 3.2
+        })
+      ];
+
+      const fa = fn.f(task1State.a);
+
+      if (task1State.mode === "free") {
+        const h = task1State.b - task1State.a;
+        const fb = fn.f(task1State.b);
+        const slope = differenceQuotient(fn, task1State.a, h);
+
+        layers.push(
+          task1Plot.lineThrough(
+            task1State.a,
+            fa,
+            slope,
+            {
+              color: COLORS.secant,
+              width: 2.8,
+              dash: "9 7"
+            }
+          )
+        );
+
+        layers.push(
+          task1Plot.point(
+            task1State.a,
+            fa,
+            {
+              color: COLORS.dark,
+              radius: 7,
+              label: "P",
+              handle: "p",
+              title: `P(${formatNumber(task1State.a)}, ${formatNumber(fa)})`
+            }
+          )
+        );
+
+        layers.push(
+          task1Plot.point(
+            task1State.b,
+            fb,
+            {
+              color: COLORS.secant,
+              radius: 7,
+              label: "Q",
+              handle: "q",
+              title: `Q(${formatNumber(task1State.b)}, ${formatNumber(fb)})`
+            }
+          )
+        );
+
+        byId("t1Formula").innerHTML = `
+          <div class="big-equation">
+            m<sub>PQ</sub> =
+            [f(b) − f(a)] / (b − a)
+          </div>
+
+          <div class="equation">
+            m<sub>PQ</sub> =
+            [${formatNumber(fb, 7)} − ${formatNumber(fa, 7)}]
+            /
+            [${formatNumber(task1State.b, 7)} − ${formatNumber(task1State.a, 7)}]
+            =
+            <strong>${formatNumber(slope, 7)}</strong>
+          </div>
+
+          <div class="equation">
+            Secant:
+            y − ${formatNumber(fa, 6)}
+            =
+            ${formatNumber(slope, 6)}
+            (x − ${formatNumber(task1State.a, 6)})
+          </div>
+        `;
+      } else {
+        const magnitude = task1SafeH();
+        const leftNeeded =
+          task1State.mode === "left" ||
+          task1State.mode === "both";
+
+        const rightNeeded =
+          task1State.mode === "right" ||
+          task1State.mode === "both";
+
+        const formulaLines = [];
+
+        if (leftNeeded && magnitude > 0) {
+          const h = -magnitude;
+          const qx = task1State.a + h;
+          const qy = fn.f(qx);
+          const slope = differenceQuotient(fn, task1State.a, h);
+
+          layers.push(
+            task1Plot.lineThrough(
+              task1State.a,
+              fa,
+              slope,
+              {
+                color: COLORS.left,
+                width: 2.6,
+                dash: "9 7"
+              }
+            )
+          );
+
+          layers.push(
+            task1Plot.point(
+              qx,
+              qy,
+              {
+                color: COLORS.left,
+                radius: 6.5,
+                label: "Q−",
+                handle: "qLeft"
+              }
+            )
+          );
+
+          formulaLines.push(`
+            <div class="equation">
+              h = −${formatNumber(magnitude, 7)}:
+              [f(a+h)−f(a)]/h =
+              <strong>${formatNumber(slope, 8)}</strong>
+            </div>
+          `);
+        }
+
+        if (rightNeeded && magnitude > 0) {
+          const h = magnitude;
+          const qx = task1State.a + h;
+          const qy = fn.f(qx);
+          const slope = differenceQuotient(fn, task1State.a, h);
+
+          layers.push(
+            task1Plot.lineThrough(
+              task1State.a,
+              fa,
+              slope,
+              {
+                color: COLORS.right,
+                width: 2.6,
+                dash: "9 7"
+              }
+            )
+          );
+
+          layers.push(
+            task1Plot.point(
+              qx,
+              qy,
+              {
+                color: COLORS.right,
+                radius: 6.5,
+                label: "Q+",
+                handle: "qRight"
+              }
+            )
+          );
+
+          formulaLines.push(`
+            <div class="equation">
+              h = +${formatNumber(magnitude, 7)}:
+              [f(a+h)−f(a)]/h =
+              <strong>${formatNumber(slope, 8)}</strong>
+            </div>
+          `);
+        }
+
+        const exactDerivative = fn.df(task1State.a);
+
+        if (Number.isFinite(exactDerivative)) {
+          layers.push(
+            task1Plot.lineThrough(
+              task1State.a,
+              fa,
+              exactDerivative,
+              {
+                color: COLORS.tangent,
+                width: 3,
+                opacity: 0.9
+              }
+            )
+          );
+        } else {
+          const leftEstimate = sideDerivativeEstimate(fn, task1State.a, -1);
+          const rightEstimate = sideDerivativeEstimate(fn, task1State.a, 1);
+
+          if (leftNeeded && leftEstimate.available) {
+            layers.push(
+              task1Plot.lineThrough(
+                task1State.a,
+                fa,
+                leftEstimate.value,
+                {
+                  color: COLORS.left,
+                  width: 2,
+                  opacity: 0.55
+                }
+              )
+            );
+          }
+
+          if (rightNeeded && rightEstimate.available) {
+            layers.push(
+              task1Plot.lineThrough(
+                task1State.a,
+                fa,
+                rightEstimate.value,
+                {
+                  color: COLORS.right,
+                  width: 2,
+                  opacity: 0.55
+                }
+              )
+            );
+          }
+        }
+
+        layers.push(
+          task1Plot.point(
+            task1State.a,
+            fa,
+            {
+              color: COLORS.dark,
+              radius: 7,
+              label: "P",
+              handle: "p"
+            }
+          )
+        );
+
+        byId("t1Formula").innerHTML = `
+          <div class="big-equation">
+            f′(a) =
+            lim<sub>h→0</sub>
+            [f(a+h)−f(a)]/h
+          </div>
+
+          ${formulaLines.join("")}
+        `;
+      }
+
+      task1Plot.render(
+        layers,
+        `${fn.formulaText}: secant and tangent exploration`
+      );
+
+      renderTask1Status();
+      renderTask1Table();
+    }
+
+    function stopTask1Animation() {
+      if (!task1State.animation) return;
+
+      cancelAnimationFrame(task1State.animation.frame);
+      task1State.animation = null;
+      byId("t1Animate").textContent = "Animate Q → P";
+    }
+
+    function startTask1Animation() {
+      if (task1State.animation) {
+        stopTask1Animation();
+        renderTask1();
+        return;
+      }
+
+      const fn = task1Function();
+      const range = fn.xMax - fn.xMin;
+      const endingDistance = range / 10000;
+      const duration = 3400;
+      const startTime = performance.now();
+
+      let startingDistance;
+      let direction = 1;
+
+      if (task1State.mode === "free") {
+        let delta = task1State.b - task1State.a;
+        direction = Math.sign(delta) || 1;
+
+        let available =
+          direction > 0
+            ? fn.xMax - task1State.a
+            : task1State.a - fn.xMin;
+
+        if (available < range * 0.03) {
+          direction *= -1;
+          available =
+            direction > 0
+              ? fn.xMax - task1State.a
+              : task1State.a - fn.xMin;
+        }
+
+        startingDistance = Math.abs(delta);
+
+        if (startingDistance < endingDistance * 3) {
+          startingDistance = Math.min(range * 0.22, available * 0.8);
+        }
+      } else {
+        startingDistance = task1RawH();
+
+        if (startingDistance < endingDistance * 3) {
+          startingDistance = Math.min(
+            range * 0.22,
+            Number(byId("t1H").max) ?
+              Math.pow(10, Number(byId("t1H").max)) :
+              range * 0.22
+          );
+
+          byId("t1H").value = Math.log10(startingDistance);
+        }
+      }
+
+      if (prefersReducedMotion) {
+        if (task1State.mode === "free") {
+          task1State.b =
+            task1State.a + direction * endingDistance;
+        } else {
+          byId("t1H").value = Math.log10(endingDistance);
+        }
+
+        renderTask1();
+        return;
+      }
+
+      task1State.animation = {
+        frame: null
+      };
+
+      const frame = now => {
+        const progress = clamp((now - startTime) / duration, 0, 1);
+
+        const distance =
+          startingDistance *
+          Math.pow(endingDistance / startingDistance, progress);
+
+        if (task1State.mode === "free") {
+          task1State.b =
+            task1State.a + direction * distance;
+        } else {
+          byId("t1H").value = Math.log10(distance);
+        }
+
+        renderTask1();
+
+        if (progress < 1 && task1State.animation) {
+          task1State.animation.frame = requestAnimationFrame(frame);
+        } else {
+          task1State.animation = null;
+          renderTask1();
+        }
+      };
+
+      task1State.animation.frame = requestAnimationFrame(frame);
+    }
+
+    byId("t1Function").addEventListener("change", event => {
+      task1State.functionId = event.target.value;
+      resetTask1();
+    });
+
+    byId("t1A").addEventListener("input", event => {
+      stopTask1Animation();
+      setTask1A(Number(event.target.value));
+      renderTask1();
+    });
+
+    byId("t1B").addEventListener("input", event => {
+      stopTask1Animation();
+      setTask1B(Number(event.target.value));
+      renderTask1();
+    });
+
+    byId("t1H").addEventListener("input", () => {
+      stopTask1Animation();
+      renderTask1();
+    });
+
+    byId("t1Mode").addEventListener("click", event => {
+      const button = event.target.closest("button[data-mode]");
+      if (!button) return;
+
+      stopTask1Animation();
+
+      task1State.mode = button.dataset.mode;
+
+      if (task1State.mode !== "free") {
+        const initialH = Math.max(
+          Math.abs(task1State.b - task1State.a),
+          task1Function().defaultH
+        );
+
+        const minimum = Math.pow(10, Number(byId("t1H").min));
+        const maximum = Math.pow(10, Number(byId("t1H").max));
+
+        byId("t1H").value =
+          Math.log10(clamp(initialH, minimum, maximum));
+
+        setTask1A(task1State.a);
+      }
+
+      renderTask1();
+    });
+
+    byId("t1ActivePoint").addEventListener("click", event => {
+      const button = event.target.closest("button[data-point]");
+      if (!button) return;
+
+      task1State.activePoint = button.dataset.point;
+      renderTask1();
+    });
+
+    byId("t1Closer").addEventListener("click", () => {
+      stopTask1Animation();
+
+      if (task1State.mode === "free") {
+        task1State.b =
+          task1State.a +
+          (task1State.b - task1State.a) / 2;
+      } else {
+        const nextValue =
+          Number(byId("t1H").value) - Math.log10(2);
+
+        byId("t1H").value = Math.max(
+          Number(byId("t1H").min),
+          nextValue
+        );
+      }
+
+      renderTask1();
+    });
+
+    byId("t1Animate").addEventListener("click", startTask1Animation);
+
+    byId("t1Reset").addEventListener("click", resetTask1);
+
+    byId("t1Plot").addEventListener("pointerdown", event => {
+      if (event.button !== 0) return;
+
+      event.preventDefault();
+      stopTask1Animation();
+
+      const explicitHandle = event.target.dataset.handle;
+
+      let handle;
+
+      if (explicitHandle) {
+        handle = explicitHandle;
+      } else if (task1State.mode === "free") {
+        handle = task1State.activePoint;
+      } else {
+        handle = "p";
+      }
+
+      task1State.drag = {
+        pointerId: event.pointerId,
+        handle,
+        clickedBackground: !explicitHandle
+      };
+
+      byId("t1Plot").setPointerCapture(event.pointerId);
+
+      const x = task1Plot.eventToX(event);
+
+      if (handle === "p") {
+        setTask1A(x);
+      } else if (handle === "q") {
+        setTask1B(x);
+      } else {
+        const distance = Math.abs(x - task1State.a);
+        const minimum = Math.pow(10, Number(byId("t1H").min));
+        const maximum = Math.pow(10, Number(byId("t1H").max));
+
+        byId("t1H").value =
+          Math.log10(clamp(distance, minimum, maximum));
+      }
+
+      renderTask1();
+    });
+
+    byId("t1Plot").addEventListener("pointermove", event => {
+      if (
+        !task1State.drag ||
+        task1State.drag.pointerId !== event.pointerId
+      ) {
+        return;
+      }
+
+      event.preventDefault();
+
+      const x = task1Plot.eventToX(event);
+      const handle = task1State.drag.handle;
+
+      if (handle === "p") {
+        setTask1A(x);
+      } else if (handle === "q") {
+        setTask1B(x);
+      } else {
+        const distance = Math.abs(x - task1State.a);
+        const minimum = Math.pow(10, Number(byId("t1H").min));
+        const maximum = Math.pow(10, Number(byId("t1H").max));
+
+        byId("t1H").value =
+          Math.log10(clamp(distance, minimum, maximum));
+      }
+
+      renderTask1();
+    });
+
+    byId("t1Plot").addEventListener("pointerup", event => {
+      if (!task1State.drag) return;
+
+      if (
+        task1State.mode === "free" &&
+        task1State.drag.clickedBackground
+      ) {
+        task1State.activePoint =
+          task1State.activePoint === "p" ? "q" : "p";
+      }
+
+      task1State.drag = null;
+      renderTask1();
+    });
+
+    /* ============================================================
+       TASK 2
+    ============================================================ */
+
+    const task2MainPlot = new SVGPlot(byId("t2MainPlot"));
+    const task2DerivativePlot = new SVGPlot(byId("t2DerivativePlot"));
+
+    const task2State = {
+      functionId: "square",
+      a: 1,
+      hSign: 1,
+      points: new Map(),
+      animation: null
+    };
+
+    function task2Function() {
+      return getFunctionEntry(task2State.functionId);
+    }
+
+    function recordTask2Point(x) {
+      const fn = task2Function();
+      const y = fn.df(x);
+
+      if (!Number.isFinite(y)) return;
+
+      const key = x.toFixed(5);
+      task2State.points.set(key, { x, y });
+
+      if (task2State.points.size > 650) {
+        const firstKey = task2State.points.keys().next().value;
+        task2State.points.delete(firstKey);
+      }
+    }
+
+    function setTask2A(value, collect = true) {
+      const fn = task2Function();
+
+      task2State.a = clamp(value, fn.xMin, fn.xMax);
+      byId("t2A").value = task2State.a;
+
+      if (collect && byId("t2Collect").checked) {
+        recordTask2Point(task2State.a);
+      }
+    }
+
+    function resetTask2() {
+      stopTask2Trace();
+
+      const fn = task2Function();
+
+      task2State.a = fn.defaultA;
+      task2State.hSign = 1;
+      task2State.points.clear();
+
+      configureLinearSlider(
+        byId("t2A"),
+        fn.xMin,
+        fn.xMax,
+        task2State.a
+      );
+
+      const range = fn.xMax - fn.xMin;
+
+      configureLogSlider(
+        byId("t2H"),
+        range / 10000,
+        range * 0.3,
+        fn.defaultH
+      );
+
+      byId("t2Collect").checked = true;
+      byId("t2ShowAnswer").checked = false;
+
+      recordTask2Point(task2State.a);
+      renderTask2();
+    }
+
+    function task2SignedH() {
+      const fn = task2Function();
+      const requested = logSliderValue(byId("t2H"));
+
+      const available =
+        task2State.hSign < 0
+          ? task2State.a - fn.xMin
+          : fn.xMax - task2State.a;
+
+      if (available <= 1e-12) return NaN;
+
+      return task2State.hSign *
+        Math.min(requested, available * 0.98);
+    }
+
+    function renderTask2() {
+      const fn = task2Function();
+      const fa = fn.f(task2State.a);
+      const exactDerivative = fn.df(task2State.a);
+      const h = task2SignedH();
+      const finiteSlope = differenceQuotient(fn, task2State.a, h);
+
+      byId("t2A").value = task2State.a;
+      byId("t2AValue").textContent = formatNumber(task2State.a, 5);
+      byId("t2HValue").textContent =
+        Number.isFinite(h) ? formatNumber(h, 6) : "unavailable";
+
+      for (const button of byId("t2Side").querySelectorAll("button")) {
+        button.classList.toggle(
+          "active",
+          Number(button.dataset.sign) === task2State.hSign
+        );
+      }
+
+      /* Original function graph */
+      task2MainPlot.setBounds(
+        fn.xMin,
+        fn.xMax,
+        fn.yMin,
+        fn.yMax
+      );
+
+      const mainLayers = [
+        task2MainPlot.curve(fn.f, {
+          color: COLORS.function,
+          width: 3.2
+        })
+      ];
+
+      if (Number.isFinite(finiteSlope) && Number.isFinite(h)) {
+        const qx = task2State.a + h;
+        const qy = fn.f(qx);
+
+        mainLayers.push(
+          task2MainPlot.lineThrough(
+            task2State.a,
+            fa,
+            finiteSlope,
+            {
+              color: COLORS.secant,
+              width: 2.4,
+              dash: "9 7"
+            }
+          )
+        );
+
+        mainLayers.push(
+          task2MainPlot.point(
+            qx,
+            qy,
+            {
+              color: COLORS.secant,
+              radius: 5.8,
+              label: "Q"
+            }
+          )
+        );
+      }
+
+      if (Number.isFinite(exactDerivative)) {
+        mainLayers.push(
+          task2MainPlot.lineThrough(
+            task2State.a,
+            fa,
+            exactDerivative,
+            {
+              color: COLORS.tangent,
+              width: 3
+            }
+          )
+        );
+      }
+
+      mainLayers.push(
+        task2MainPlot.point(
+          task2State.a,
+          fa,
+          {
+            color: COLORS.dark,
+            radius: 7,
+            label: "P"
+          }
+        )
+      );
+
+      task2MainPlot.render(
+        mainLayers,
+        `${fn.formulaText} with tangent line`
+      );
+
+      /* Derivative graph */
+      task2DerivativePlot.setBounds(
+        fn.xMin,
+        fn.xMax,
+        fn.dyMin,
+        fn.dyMax
+      );
+
+      const derivativeLayers = [];
+
+      if (byId("t2ShowAnswer").checked) {
+        derivativeLayers.push(
+          task2DerivativePlot.curve(fn.df, {
+            color: COLORS.tangent,
+            width: 3,
+            opacity: 0.85
+          })
+        );
+      }
+
+      const collectedPoints = [...task2State.points.values()]
+        .sort((a, b) => a.x - b.x);
+
+      derivativeLayers.push(
+        task2DerivativePlot.polyline(collectedPoints, {
+          color: COLORS.derivative,
+          width: 2.1,
+          opacity: 0.65,
+          maxDx: (fn.xMax - fn.xMin) / 35,
+          maxDy: (fn.dyMax - fn.dyMin) * 0.42
+        })
+      );
+
+      for (const point of collectedPoints) {
+        derivativeLayers.push(
+          task2DerivativePlot.point(
+            point.x,
+            point.y,
+            {
+              color: COLORS.derivative,
+              radius: 2.9
+            }
+          )
+        );
+      }
+
+      if (Number.isFinite(exactDerivative)) {
+        derivativeLayers.push(
+          task2DerivativePlot.point(
+            task2State.a,
+            exactDerivative,
+            {
+              color: COLORS.tangent,
+              radius: 7,
+              label: "(a, f′(a))"
+            }
+          )
+        );
+      }
+
+      task2DerivativePlot.render(
+        derivativeLayers,
+        `Collected points for the derivative of ${fn.formulaText}`
+      );
+
+      const qValue =
+        Number.isFinite(h)
+          ? fn.f(task2State.a + h)
+          : NaN;
+
+      byId("t2Formula").innerHTML = `
+        <div class="big-equation">
+          f′(a) =
+          lim<sub>h→0</sub>
+          [f(a+h)−f(a)]/h
+        </div>
+
+        <div class="equation">
+          a = ${formatNumber(task2State.a, 7)},
+          h = ${formatNumber(h, 7)}
+        </div>
+
+        <div class="equation">
+          [${formatNumber(qValue, 8)} − ${formatNumber(fa, 8)}]
+          /
+          ${formatNumber(h, 8)}
+          =
+          <strong>${formatNumber(finiteSlope, 8)}</strong>
+        </div>
+
+        ${
+          Number.isFinite(exactDerivative) && Number.isFinite(finiteSlope)
+            ? `
+              <div class="small-note">
+                Approximation error:
+                ${formatNumber(Math.abs(finiteSlope - exactDerivative), 8)}
+              </div>
+            `
+            : `
+              <div class="small-note">
+                No ordinary two-sided tangent slope is defined at this point.
+              </div>
+            `
+        }
+      `;
+
+      byId("t2DerivativeFormula").innerHTML = fn.derivativeHTML;
+
+      byId("t2Values").innerHTML = `
+        <dl class="definition-list">
+          <dt>x-coordinate</dt>
+          <dd>a = ${formatNumber(task2State.a, 6)}</dd>
+
+          <dt>Function value</dt>
+          <dd>f(a) = ${formatNumber(fa, 7)}</dd>
+
+          <dt>Finite slope</dt>
+          <dd>m<sub>h</sub> = ${formatNumber(finiteSlope, 7)}</dd>
+
+          <dt>Derivative</dt>
+          <dd>f′(a) = ${formatNumber(exactDerivative, 7)}</dd>
+        </dl>
+      `;
+
+      byId("t2Count").textContent =
+        `${task2State.points.size} derivative point(s) collected.`;
+
+      const gauge = byId("t2Gauge");
+      const needle = byId("t2Needle");
+
+      if (Number.isFinite(exactDerivative)) {
+        gauge.classList.remove("undefined");
+
+        const angle =
+          -Math.atan(exactDerivative) * 180 / Math.PI;
+
+        needle.style.transform = `rotate(${angle}deg)`;
+        gauge.setAttribute(
+          "aria-label",
+          `Slope visualisation: ${formatNumber(exactDerivative)}`
+        );
+      } else {
+        gauge.classList.add("undefined");
+        needle.style.transform = "rotate(0deg)";
+        gauge.setAttribute("aria-label", "The derivative is undefined");
+      }
+
+      byId("t2Trace").textContent =
+        task2State.animation
+          ? "Stop auto-trace"
+          : "Auto-trace derivative";
+    }
+
+    function stopTask2Trace() {
+      if (!task2State.animation) return;
+
+      cancelAnimationFrame(task2State.animation.frame);
+      task2State.animation = null;
+      byId("t2Trace").textContent = "Auto-trace derivative";
+    }
+
+    function startTask2Trace() {
+      if (task2State.animation) {
+        stopTask2Trace();
+        renderTask2();
+        return;
+      }
+
+      const fn = task2Function();
+      const steps = 260;
+
+      if (prefersReducedMotion) {
+        for (let i = 0; i <= steps; i++) {
+          const x =
+            fn.xMin +
+            ((fn.xMax - fn.xMin) * i) / steps;
+
+          recordTask2Point(x);
+        }
+
+        setTask2A(fn.xMax, false);
+        renderTask2();
+        return;
+      }
+
+      const duration = 4200;
+      const startTime = performance.now();
+
+      let previousIndex = -1;
+
+      task2State.animation = {
+        frame: null
+      };
+
+      const frame = now => {
+        const progress = clamp((now - startTime) / duration, 0, 1);
+        const currentIndex = Math.floor(progress * steps);
+
+        for (
+          let index = previousIndex + 1;
+          index <= currentIndex;
+          index++
+        ) {
+          const x =
+            fn.xMin +
+            ((fn.xMax - fn.xMin) * index) / steps;
+
+          recordTask2Point(x);
+        }
+
+        previousIndex = currentIndex;
+
+        const currentX =
+          fn.xMin + (fn.xMax - fn.xMin) * progress;
+
+        setTask2A(currentX, false);
+        renderTask2();
+
+        if (progress < 1 && task2State.animation) {
+          task2State.animation.frame = requestAnimationFrame(frame);
+        } else {
+          task2State.animation = null;
+          renderTask2();
+        }
+      };
+
+      task2State.animation.frame = requestAnimationFrame(frame);
+    }
+
+    function bindHorizontalPlotDrag(svg, plot, callback) {
+      let pointerId = null;
+
+      svg.addEventListener("pointerdown", event => {
+        if (event.button !== 0) return;
+
+        event.preventDefault();
+        pointerId = event.pointerId;
+        svg.setPointerCapture(pointerId);
+
+        callback(plot.eventToX(event));
+      });
+
+      svg.addEventListener("pointermove", event => {
+        if (pointerId !== event.pointerId) return;
+
+        event.preventDefault();
+        callback(plot.eventToX(event));
+      });
+
+      svg.addEventListener("pointerup", event => {
+        if (pointerId === event.pointerId) {
+          pointerId = null;
+        }
+      });
+    }
+
+    bindHorizontalPlotDrag(
+      byId("t2MainPlot"),
+      task2MainPlot,
+      x => {
+        stopTask2Trace();
+        setTask2A(x, true);
+        renderTask2();
+      }
+    );
+
+    bindHorizontalPlotDrag(
+      byId("t2DerivativePlot"),
+      task2DerivativePlot,
+      x => {
+        stopTask2Trace();
+        setTask2A(x, true);
+        renderTask2();
+      }
+    );
+
+    byId("t2Function").addEventListener("change", event => {
+      task2State.functionId = event.target.value;
+      resetTask2();
+    });
+
+    byId("t2A").addEventListener("input", event => {
+      stopTask2Trace();
+      setTask2A(Number(event.target.value), true);
+      renderTask2();
+    });
+
+    byId("t2H").addEventListener("input", () => {
+      stopTask2Trace();
+      renderTask2();
+    });
+
+    byId("t2Side").addEventListener("click", event => {
+      const button = event.target.closest("button[data-sign]");
+      if (!button) return;
+
+      stopTask2Trace();
+      task2State.hSign = Number(button.dataset.sign);
+      renderTask2();
+    });
+
+    byId("t2Collect").addEventListener("change", () => {
+      if (byId("t2Collect").checked) {
+        recordTask2Point(task2State.a);
+      }
+
+      renderTask2();
+    });
+
+    byId("t2ShowAnswer").addEventListener("change", renderTask2);
+
+    byId("t2Trace").addEventListener("click", startTask2Trace);
+
+    byId("t2Clear").addEventListener("click", () => {
+      stopTask2Trace();
+      task2State.points.clear();
+      renderTask2();
+    });
+
+    byId("t2Reset").addEventListener("click", resetTask2);
+
+    /* ============================================================
+       TASK 3 — PIECEWISE FUNCTIONS
+    ============================================================ */
+
+    const PIECEWISE_PRESETS = {
+      smooth: {
+        id: "smooth",
+        c: 1,
+        xMin: -3,
+        xMax: 5,
+        yMin: -3,
+        yMax: 11,
+        left: x => x * x,
+        right: x => 2 * x - 1,
+        dLeft: x => 2 * x,
+        dRight: () => 2,
+        leftHTML: "x<sup>2</sup>, &nbsp; x ≤ 1",
+        rightHTML: "2x − 1, &nbsp; x &gt; 1",
+        description: "The two branches meet with the same slope."
+      },
+
+      corner: {
+        id: "corner",
+        c: 0,
+        xMin: -4,
+        xMax: 4,
+        yMin: -2,
+        yMax: 5,
+        left: x => -x,
+        right: x => x,
+        dLeft: () => -1,
+        dRight: () => 1,
+        leftHTML: "−x, &nbsp; x ≤ 0",
+        rightHTML: "x, &nbsp; x &gt; 0",
+        description: "The function is continuous, but the slopes disagree."
+      },
+
+      jump: {
+        id: "jump",
+        c: 0,
+        xMin: -3,
+        xMax: 3,
+        yMin: -2,
+        yMax: 11,
+        left: x => x * x + 1,
+        right: x => x,
+        dLeft: x => 2 * x,
+        dRight: () => 1,
+        leftHTML: "x<sup>2</sup> + 1, &nbsp; x ≤ 0",
+        rightHTML: "x, &nbsp; x &gt; 0",
+        description: "A jump discontinuity prevents differentiability."
+      }
+    };
+
+    const task3Plot = new SVGPlot(byId("t3Plot"));
+
+    const task3State = {
+      pieceId: "smooth",
+      mLeft: -1,
+      mRight: 2,
+      animation: null
+    };
+
+    function linearFormula(coefficient) {
+      if (approximatelyEqual(coefficient, 0)) return "0";
+      if (approximatelyEqual(coefficient, 1)) return "x";
+      if (approximatelyEqual(coefficient, -1)) return "−x";
+
+      return `${formatNumber(coefficient, 2)}x`;
+    }
+
+    function task3Piece() {
+      if (task3State.pieceId !== "custom") {
+        return PIECEWISE_PRESETS[task3State.pieceId];
+      }
+
+      return {
+        id: "custom",
+        c: 0,
+        xMin: -4,
+        xMax: 4,
+        yMin: -18,
+        yMax: 18,
+        left: x => task3State.mLeft * x,
+        right: x => task3State.mRight * x,
+        dLeft: () => task3State.mLeft,
+        dRight: () => task3State.mRight,
+        leftHTML:
+          `${linearFormula(task3State.mLeft)}, &nbsp; x ≤ 0`,
+        rightHTML:
+          `${linearFormula(task3State.mRight)}, &nbsp; x &gt; 0`,
+        description:
+          "Adjust the two slopes until the one-sided derivatives agree."
+      };
+    }
+
+    function task3Statistics(piece) {
+      const c = piece.c;
+      const fC = piece.left(c);
+      const leftLimit = piece.left(c);
+      const rightLimit = piece.right(c);
+
+      const continuous =
+        approximatelyEqual(leftLimit, rightLimit, 1e-9) &&
+        approximatelyEqual(fC, leftLimit, 1e-9);
+
+      const leftDerivative = piece.dLeft(c);
+
+      const rightDerivative =
+        continuous
+          ? piece.dRight(c)
+          : NaN;
+
+      const derivativeExists =
+        continuous &&
+        Number.isFinite(leftDerivative) &&
+        Number.isFinite(rightDerivative) &&
+        approximatelyEqual(leftDerivative, rightDerivative, 1e-8);
+
+      return {
+        c,
+        fC,
+        leftLimit,
+        rightLimit,
+        continuous,
+        leftDerivative,
+        rightDerivative,
+        derivativeExists
+      };
+    }
+
+    function task3H() {
+      const piece = task3Piece();
+      const requested = logSliderValue(byId("t3H"));
+
+      const available = Math.min(
+        piece.c - piece.xMin,
+        piece.xMax - piece.c
+      );
+
+      return Math.min(requested, available * 0.98);
+    }
+
+    function configureTask3H() {
+      const piece = task3Piece();
+      const range = piece.xMax - piece.xMin;
+      const maximum = Math.min(
+        piece.c - piece.xMin,
+        piece.xMax - piece.c
+      ) * 0.8;
+
+      configureLogSlider(
+        byId("t3H"),
+        range / 10000,
+        maximum,
+        range * 0.12
+      );
+    }
+
+    function resetTask3() {
+      stopTask3Animation();
+
+      task3State.mLeft = -1;
+      task3State.mRight = 2;
+
+      byId("t3ML").value = task3State.mLeft;
+      byId("t3MR").value = task3State.mRight;
+
+      configureTask3H();
+      renderTask3();
+    }
+
+    function piecewiseFormulaMarkup(piece) {
+      return `
+        <div class="piecewise-formula">
+          <span>f(x) =</span>
+          <span class="brace">{</span>
+          <span class="piecewise-cases">
+            <span>${piece.leftHTML}</span>
+            <span>${piece.rightHTML}</span>
+          </span>
+        </div>
+
+        <p class="small-note">${piece.description}</p>
+      `;
+    }
+
+    function renderTask3Table(piece, statistics) {
+      const range = piece.xMax - piece.xMin;
+
+      const base = Math.min(
+        range * 0.12,
+        (piece.c - piece.xMin) * 0.5,
+        (piece.xMax - piece.c) * 0.5
+      );
+
+      const magnitudes = [
+        base,
+        base / 5,
+        base / 25,
+        base / 125
+      ];
+
+      const rows = magnitudes.map(r => {
+        const leftQuotient =
+          (piece.left(piece.c - r) - statistics.fC) / (-r);
+
+        const rightQuotient =
+          (piece.right(piece.c + r) - statistics.fC) / r;
+
+        return `
+          <tr>
+            <td>${formatNumber(r, 7)}</td>
+            <td>${formatNumber(leftQuotient, 8)}</td>
+            <td>${formatNumber(rightQuotient, 8)}</td>
+          </tr>
+        `;
+      });
+
+      byId("t3TableBody").innerHTML = rows.join("");
+    }
+
+    function renderTask3Status(statistics) {
+      if (statistics.derivativeExists) {
+        setStatus(
+          byId("t3Status"),
+          "good",
+          "The derivative exists",
+          `
+            <div>
+              Continuity:
+              lim<sub>x→c−</sub>f(x) =
+              lim<sub>x→c+</sub>f(x) =
+              f(c) =
+              ${formatNumber(statistics.fC, 7)}.
+            </div>
+
+            <div style="margin-top:7px">
+              f′<sub>−</sub>(c) =
+              ${formatNumber(statistics.leftDerivative, 7)}
+              and
+              f′<sub>+</sub>(c) =
+              ${formatNumber(statistics.rightDerivative, 7)}.
+            </div>
+
+            <div style="margin-top:7px">
+              Therefore,
+              <strong>
+                f′(${formatNumber(statistics.c, 5)}) =
+                ${formatNumber(statistics.leftDerivative, 7)}
+              </strong>.
+            </div>
+          `
+        );
+
+        return;
+      }
+
+      if (!statistics.continuous) {
+        setStatus(
+          byId("t3Status"),
+          "warn",
+          "The function is not continuous",
+          `
+            Left limit =
+            ${formatNumber(statistics.leftLimit, 7)},
+            right limit =
+            ${formatNumber(statistics.rightLimit, 7)}, and
+            f(c) =
+            ${formatNumber(statistics.fC, 7)}.
+
+            <div style="margin-top:7px">
+              Since differentiability implies continuity,
+              the derivative cannot exist at c.
+            </div>
+          `
+        );
+
+        return;
+      }
+
+      setStatus(
+        byId("t3Status"),
+        "warn",
+        "The one-sided derivatives disagree",
+        `
+          The function is continuous at c, but
+
+          <div style="margin-top:7px">
+            f′<sub>−</sub>(c) =
+            ${formatNumber(statistics.leftDerivative, 7)}
+            while
+            f′<sub>+</sub>(c) =
+            ${formatNumber(statistics.rightDerivative, 7)}.
+          </div>
+
+          <div style="margin-top:7px">
+            Therefore, f′(c) does not exist.
+          </div>
+        `
+      );
+    }
+
+    function renderTask3() {
+      const piece = task3Piece();
+      const statistics = task3Statistics(piece);
+      const h = task3H();
+
+      byId("t3CustomPanel").hidden =
+        task3State.pieceId !== "custom";
+
+      byId("t3MLValue").textContent =
+        formatNumber(task3State.mLeft, 2);
+
+      byId("t3MRValue").textContent =
+        formatNumber(task3State.mRight, 2);
+
+      byId("t3HValue").textContent =
+        formatNumber(h, 7);
+
+      byId("t3Animate").textContent =
+        task3State.animation
+          ? "Stop animation"
+          : "Animate h → 0";
+
+      task3Plot.setBounds(
+        piece.xMin,
+        piece.xMax,
+        piece.yMin,
+        piece.yMax
+      );
+
+      const qLeftX = piece.c - h;
+      const qRightX = piece.c + h;
+
+      const qLeftY = piece.left(qLeftX);
+      const qRightY = piece.right(qRightX);
+
+      const leftQuotient =
+        (qLeftY - statistics.fC) / (-h);
+
+      const rightQuotient =
+        (qRightY - statistics.fC) / h;
+
+      const layers = [];
+
+      if (statistics.derivativeExists) {
+        layers.push(
+          task3Plot.lineThrough(
+            piece.c,
+            statistics.fC,
+            statistics.leftDerivative,
+            {
+              color: COLORS.tangent,
+              width: 3,
+              opacity: 0.65
+            }
+          )
+        );
+      } else {
+        if (Number.isFinite(statistics.leftDerivative)) {
+          const leftEndY =
+            statistics.fC +
+            statistics.leftDerivative *
+            (piece.xMin - piece.c);
+
+          layers.push(
+            task3Plot.segment(
+              piece.xMin,
+              leftEndY,
+              piece.c,
+              statistics.fC,
+              {
+                color: COLORS.left,
+                width: 2.3,
+                opacity: 0.45
+              }
+            )
+          );
+        }
+
+        if (Number.isFinite(statistics.rightDerivative)) {
+          const rightEndY =
+            statistics.fC +
+            statistics.rightDerivative *
+            (piece.xMax - piece.c);
+
+          layers.push(
+            task3Plot.segment(
+              piece.c,
+              statistics.fC,
+              piece.xMax,
+              rightEndY,
+              {
+                color: COLORS.right,
+                width: 2.3,
+                opacity: 0.45
+              }
+            )
+          );
+        }
+      }
+
+      layers.push(
+        task3Plot.curve(piece.left, {
+          from: piece.xMin,
+          to: piece.c,
+          color: COLORS.left,
+          width: 3.2
+        })
+      );
+
+      layers.push(
+        task3Plot.curve(piece.right, {
+          from: piece.c,
+          to: piece.xMax,
+          color: COLORS.right,
+          width: 3.2
+        })
+      );
+
+      layers.push(
+        task3Plot.lineThrough(
+          piece.c,
+          statistics.fC,
+          leftQuotient,
+          {
+            color: COLORS.left,
+            width: 2.5,
+            dash: "9 7"
+          }
+        )
+      );
+
+      layers.push(
+        task3Plot.lineThrough(
+          piece.c,
+          statistics.fC,
+          rightQuotient,
+          {
+            color: COLORS.right,
+            width: 2.5,
+            dash: "9 7"
+          }
+        )
+      );
+
+      layers.push(
+        task3Plot.point(
+          qLeftX,
+          qLeftY,
+          {
+            color: COLORS.left,
+            radius: 6,
+            label: "Q−"
+          }
+        )
+      );
+
+      layers.push(
+        task3Plot.point(
+          qRightX,
+          qRightY,
+          {
+            color: COLORS.right,
+            radius: 6,
+            label: "Q+"
+          }
+        )
+      );
+
+      if (!statistics.continuous) {
+        layers.push(
+          task3Plot.point(
+            piece.c,
+            statistics.rightLimit,
+            {
+              color: COLORS.right,
+              radius: 7,
+              open: true,
+              label: "open"
+            }
+          )
+        );
+      }
+
+      layers.push(
+        task3Plot.point(
+          piece.c,
+          statistics.fC,
+          {
+            color: COLORS.dark,
+            radius: 7,
+            label: "P"
+          }
+        )
+      );
+
+      task3Plot.render(
+        layers,
+        "Piecewise function with left and right secant lines"
+      );
+
+      byId("t3Formula").innerHTML =
+        piecewiseFormulaMarkup(piece);
+
+      byId("t3Quotients").innerHTML = `
+        <div class="equation">
+          Left:
+          [f(c−h)−f(c)]/(−h)
+          =
+          <strong>${formatNumber(leftQuotient, 8)}</strong>
+        </div>
+
+        <div class="equation">
+          Right:
+          [f(c+h)−f(c)]/h
+          =
+          <strong>${formatNumber(rightQuotient, 8)}</strong>
+        </div>
+      `;
+
+      renderTask3Status(statistics);
+      renderTask3Table(piece, statistics);
+    }
+
+    function stopTask3Animation() {
+      if (!task3State.animation) return;
+
+      cancelAnimationFrame(task3State.animation.frame);
+      task3State.animation = null;
+      byId("t3Animate").textContent = "Animate h → 0";
+    }
+
+    function startTask3Animation() {
+      if (task3State.animation) {
+        stopTask3Animation();
+        renderTask3();
+        return;
+      }
+
+      const minimumH =
+        Math.pow(10, Number(byId("t3H").min));
+
+      let startingH = task3H();
+
+      if (startingH < minimumH * 3) {
+        startingH =
+          Math.pow(10, Number(byId("t3H").max));
+
+        byId("t3H").value = Math.log10(startingH);
+      }
+
+      if (prefersReducedMotion) {
+        byId("t3H").value = Math.log10(minimumH);
+        renderTask3();
+        return;
+      }
+
+      const duration = 3500;
+      const startTime = performance.now();
+
+      task3State.animation = {
+        frame: null
+      };
+
+      const frame = now => {
+        const progress = clamp((now - startTime) / duration, 0, 1);
+
+        const h =
+          startingH *
+          Math.pow(minimumH / startingH, progress);
+
+        byId("t3H").value = Math.log10(h);
+        renderTask3();
+
+        if (progress < 1 && task3State.animation) {
+          task3State.animation.frame = requestAnimationFrame(frame);
+        } else {
+          task3State.animation = null;
+          renderTask3();
+        }
+      };
+
+      task3State.animation.frame = requestAnimationFrame(frame);
+    }
+
+    byId("t3Piece").addEventListener("change", event => {
+      stopTask3Animation();
+      task3State.pieceId = event.target.value;
+      configureTask3H();
+      renderTask3();
+    });
+
+    byId("t3H").addEventListener("input", () => {
+      stopTask3Animation();
+      renderTask3();
+    });
+
+    byId("t3ML").addEventListener("input", event => {
+      stopTask3Animation();
+      task3State.mLeft = Number(event.target.value);
+      renderTask3();
+    });
+
+    byId("t3MR").addEventListener("input", event => {
+      stopTask3Animation();
+      task3State.mRight = Number(event.target.value);
+      renderTask3();
+    });
+
+    byId("t3Match").addEventListener("click", () => {
+      stopTask3Animation();
+
+      task3State.mRight = task3State.mLeft;
+      byId("t3MR").value = task3State.mRight;
+
+      renderTask3();
+    });
+
+    byId("t3Closer").addEventListener("click", () => {
+      stopTask3Animation();
+
+      const next =
+        Number(byId("t3H").value) - Math.log10(2);
+
+      byId("t3H").value = Math.max(
+        Number(byId("t3H").min),
+        next
+      );
+
+      renderTask3();
+    });
+
+    byId("t3Animate").addEventListener("click", startTask3Animation);
+
+    byId("t3Reset").addEventListener("click", resetTask3);
+
+    bindHorizontalPlotDrag(
+      byId("t3Plot"),
+      task3Plot,
+      x => {
+        stopTask3Animation();
+
+        const piece = task3Piece();
+        const distance = Math.abs(x - piece.c);
+
+        const minimum =
+          Math.pow(10, Number(byId("t3H").min));
+
+        const maximum =
+          Math.pow(10, Number(byId("t3H").max));
+
+        byId("t3H").value =
+          Math.log10(clamp(distance, minimum, maximum));
+
+        renderTask3();
+      }
+    );
+
+    /* ============================================================
+       TAB NAVIGATION
+    ============================================================ */
+
+    function activateTask(taskId) {
+      for (const tab of document.querySelectorAll(".task-tab")) {
+        const selected = tab.dataset.target === taskId;
+
+        tab.classList.toggle("active", selected);
+        tab.setAttribute("aria-selected", String(selected));
+      }
+
+      for (const panel of document.querySelectorAll(".task-panel")) {
+        panel.classList.toggle("active", panel.id === taskId);
+      }
+
+      if (taskId === "task1") renderTask1();
+      if (taskId === "task2") renderTask2();
+      if (taskId === "task3") renderTask3();
+    }
+
+    for (const tab of document.querySelectorAll(".task-tab")) {
+      tab.addEventListener("click", () => {
+        activateTask(tab.dataset.target);
+      });
+    }
+
+    /* ============================================================
+       INITIALISE PAGE
+    ============================================================ */
+
+    byId("t1Function").value = task1State.functionId;
+    byId("t2Function").value = task2State.functionId;
+    byId("t3Piece").value = task3State.pieceId;
+
+    resetTask1();
+    resetTask2();
+    resetTask3();
+  </script>
+</body>
+</html>
