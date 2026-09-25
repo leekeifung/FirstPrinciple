@@ -2,33 +2,39 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
   <title>AMA1702 Calculus — First Principle Explorer</title>
 
   <meta
     name="description"
-    content="Interactive AMA1702 Calculus learning activity for secant lines, tangent lines, first-principle differentiation and one-sided derivatives."
+    content="Interactive AMA1702 Calculus activity for secant lines, tangent lines, first-principle differentiation, one-sided derivatives and self-assessment."
   >
 
   <style>
     :root {
       --poly-red: #a6192e;
-      --primary: #1e3a8a;
-      --primary-light: #dbeafe;
+      --primary: #293f92;
+      --primary-2: #405cc4;
+      --primary-light: #e8edff;
+
       --function: #3157b7;
       --left: #0284c7;
       --right: #e11d48;
       --secant: #f59e0b;
       --tangent: #059669;
       --derivative: #7c3aed;
+      --derivative-dark: #4c1d95;
 
       --ink: #172033;
       --muted: #64748b;
       --soft: #f5f7fb;
       --panel: #ffffff;
       --border: #dce3ed;
-      --plot-bg: #ffffff;
       --grid: #e8edf4;
 
       --good-bg: #ecfdf5;
@@ -76,7 +82,8 @@
     button,
     select,
     input[type="range"],
-    input[type="checkbox"] {
+    input[type="checkbox"],
+    input[type="radio"] {
       cursor: pointer;
     }
 
@@ -91,11 +98,18 @@
       display: none !important;
     }
 
+    /* ==========================================================
+       HEADER
+    ========================================================== */
+
     .site-header {
       color: white;
       background:
-        linear-gradient(125deg, rgba(166, 25, 46, 0.97), rgba(30, 58, 138, 0.96)),
-        #1e3a8a;
+        linear-gradient(
+          125deg,
+          rgba(166, 25, 46, 0.97),
+          rgba(30, 58, 138, 0.96)
+        );
       padding: 42px 24px 36px;
       position: relative;
       overflow: hidden;
@@ -128,8 +142,8 @@
     }
 
     h1 {
-      margin: 0;
       max-width: 900px;
+      margin: 0;
       font-size: clamp(2rem, 5vw, 3.6rem);
       line-height: 1.12;
     }
@@ -162,13 +176,17 @@
       margin: 0 auto 55px;
     }
 
+    /* ==========================================================
+       DISPLAY-STYLE MATHEMATICS
+    ========================================================== */
+
     .principle-banner {
       display: grid;
-      grid-template-columns: auto 1fr;
-      gap: 18px;
+      grid-template-columns: auto minmax(0, 1fr);
+      gap: 20px;
       align-items: center;
       margin: -18px auto 22px;
-      padding: 20px 22px;
+      padding: 18px 22px;
       background: white;
       border: 1px solid var(--border);
       border-radius: var(--radius);
@@ -180,21 +198,81 @@
     .principle-label {
       color: white;
       background: var(--primary);
-      padding: 7px 12px;
+      padding: 7px 13px;
       border-radius: 999px;
       font-weight: 750;
       white-space: nowrap;
     }
 
     .principle-equation {
-      font-family: "Cambria Math", Cambria, Georgia, serif;
-      font-size: clamp(1.1rem, 3vw, 1.45rem);
+      min-width: 0;
+      padding: 4px 0;
       overflow-x: auto;
     }
 
+    .math-display {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.27em;
+      min-width: max-content;
+      color: #17213f;
+      font-family: "Cambria Math", Cambria, "Times New Roman", serif;
+      font-size: clamp(1.3rem, 3vw, 1.72rem);
+      line-height: 1.05;
+    }
+
+    .math-display.compact {
+      font-size: clamp(1.06rem, 2.5vw, 1.3rem);
+    }
+
+    .math-limit {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 0 0.05em;
+      line-height: 0.82;
+    }
+
+    .math-limit-main {
+      font-size: 1.08em;
+    }
+
+    .math-limit-sub {
+      margin-top: 0.24em;
+      font-family: "Cambria Math", Cambria, serif;
+      font-size: 0.54em;
+      white-space: nowrap;
+    }
+
+    .math-frac {
+      display: inline-grid;
+      grid-template-rows: auto auto;
+      align-items: center;
+      text-align: center;
+      vertical-align: middle;
+      line-height: 1.12;
+      margin: 0 0.12em;
+    }
+
+    .math-num {
+      padding: 0 0.28em 0.1em;
+      border-bottom: 2px solid currentColor;
+      white-space: nowrap;
+    }
+
+    .math-den {
+      padding: 0.1em 0.28em 0;
+      white-space: nowrap;
+    }
+
+    /* ==========================================================
+       TASK NAVIGATION
+    ========================================================== */
+
     .task-tabs {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(4, 1fr);
       gap: 8px;
       margin: 22px 0;
       padding: 7px;
@@ -208,7 +286,7 @@
 
     .task-tab {
       min-height: 52px;
-      padding: 9px 13px;
+      padding: 9px 12px;
       color: #475569;
       background: transparent;
       border: 0;
@@ -219,12 +297,12 @@
 
     .task-tab:hover {
       color: var(--primary);
-      background: rgba(255, 255, 255, 0.7);
+      background: rgba(255, 255, 255, 0.72);
     }
 
     .task-tab.active {
       color: white;
-      background: linear-gradient(120deg, var(--primary), #3157b7);
+      background: linear-gradient(120deg, var(--primary), var(--primary-2));
       box-shadow: 0 4px 13px rgba(30, 58, 138, 0.25);
     }
 
@@ -248,6 +326,10 @@
         transform: none;
       }
     }
+
+    /* ==========================================================
+       GENERAL LAYOUT
+    ========================================================== */
 
     .section-heading {
       display: flex;
@@ -301,7 +383,9 @@
     .control-card,
     .plot-card,
     .readout-card,
-    .table-card {
+    .table-card,
+    .quiz-card,
+    .quiz-sidebar {
       background: var(--panel);
       border: 1px solid var(--border);
       border-radius: var(--radius);
@@ -317,7 +401,9 @@
     .control-card h3,
     .plot-card h3,
     .readout-card h3,
-    .table-card h3 {
+    .table-card h3,
+    .quiz-card h3,
+    .quiz-sidebar h3 {
       margin: 0 0 12px;
       color: #263653;
     }
@@ -346,7 +432,8 @@
       font-weight: 750;
     }
 
-    select {
+    select,
+    .field-input {
       width: 100%;
       min-height: 43px;
       padding: 8px 10px;
@@ -354,6 +441,10 @@
       background: white;
       border: 1px solid #cbd5e1;
       border-radius: 9px;
+    }
+
+    .code-input {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     }
 
     input[type="range"] {
@@ -429,6 +520,12 @@
       filter: brightness(1.08);
     }
 
+    .action-button:disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
+      filter: none;
+    }
+
     .action-button.secondary {
       color: var(--primary);
       background: white;
@@ -445,6 +542,10 @@
       display: grid;
       gap: 16px;
     }
+
+    /* ==========================================================
+       PLOTS
+    ========================================================== */
 
     .plot-card {
       min-width: 0;
@@ -475,6 +576,10 @@
       user-select: none;
     }
 
+    .derivative-card .plot-surface {
+      fill: #fcfaff;
+    }
+
     .plot-grid,
     .plot-axis,
     .plot-tick,
@@ -502,6 +607,14 @@
       cursor: grabbing;
     }
 
+    .collected-trace {
+      filter: drop-shadow(0 1px 1px rgba(76, 29, 149, 0.35));
+    }
+
+    .collected-point {
+      filter: drop-shadow(0 1px 1px rgba(76, 29, 149, 0.35));
+    }
+
     .legend {
       display: flex;
       flex-wrap: wrap;
@@ -526,9 +639,13 @@
       border-top-style: dashed;
     }
 
+    .legend-line.thick {
+      border-top-width: 5px;
+    }
+
     .legend-dot {
-      width: 10px;
-      height: 10px;
+      width: 11px;
+      height: 11px;
       border-radius: 50%;
       background: currentColor;
     }
@@ -695,6 +812,10 @@
       position: absolute;
     }
 
+    /* ==========================================================
+       TASK 3 CUSTOM FUNCTIONS
+    ========================================================== */
+
     .piecewise-formula {
       display: grid;
       grid-template-columns: auto auto 1fr;
@@ -729,10 +850,293 @@
       border-radius: 10px;
     }
 
+    .input-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .input-field {
+      display: grid;
+      gap: 5px;
+    }
+
+    .input-field.full {
+      grid-column: 1 / -1;
+    }
+
+    .input-field label {
+      color: #334155;
+      font-size: 0.87rem;
+      font-weight: 720;
+    }
+
+    .expression-examples {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    .example-button {
+      padding: 6px 9px;
+      color: var(--primary);
+      background: white;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+
+    .example-button:hover {
+      background: var(--primary-light);
+      border-color: #a5b4fc;
+    }
+
     .small-note {
       color: var(--muted);
       font-size: 0.86rem;
     }
+
+    /* ==========================================================
+       TASK 4 QUIZ
+    ========================================================== */
+
+    .quiz-layout {
+      display: grid;
+      grid-template-columns: minmax(245px, 0.65fr) minmax(0, 2fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .quiz-sidebar {
+      padding: 20px;
+      position: sticky;
+      top: 82px;
+    }
+
+    .quiz-score {
+      display: grid;
+      place-items: center;
+      min-height: 110px;
+      margin: 12px 0;
+      color: white;
+      background:
+        linear-gradient(135deg, var(--primary), var(--derivative));
+      border-radius: 14px;
+      text-align: center;
+    }
+
+    .quiz-score-number {
+      font-size: 2rem;
+      font-weight: 850;
+      line-height: 1;
+    }
+
+    .quiz-score-label {
+      margin-top: 5px;
+      font-size: 0.84rem;
+      opacity: 0.9;
+    }
+
+    .progress-track {
+      height: 11px;
+      margin: 9px 0 5px;
+      background: #e2e8f0;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      width: 0;
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--derivative));
+      border-radius: inherit;
+      transition: width 220ms ease;
+    }
+
+    .topic-summary {
+      display: grid;
+      gap: 8px;
+      margin: 16px 0;
+    }
+
+    .topic-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      padding-bottom: 7px;
+      border-bottom: 1px solid #e2e8f0;
+      color: #475569;
+      font-size: 0.86rem;
+    }
+
+    .topic-row strong {
+      color: var(--primary);
+    }
+
+    .quiz-card {
+      min-height: 490px;
+      padding: clamp(20px, 4vw, 34px);
+    }
+
+    .quiz-meta {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .quiz-topic {
+      padding: 5px 10px;
+      color: var(--primary);
+      background: var(--primary-light);
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 750;
+    }
+
+    .quiz-question-number {
+      color: var(--muted);
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+
+    .quiz-question {
+      margin: 8px 0 22px;
+      color: #1e2c4a;
+      font-family: "Cambria Math", Cambria, Georgia, serif;
+      font-size: clamp(1.15rem, 3vw, 1.45rem);
+      line-height: 1.45;
+    }
+
+    .quiz-options {
+      display: grid;
+      gap: 10px;
+    }
+
+    .quiz-option {
+      width: 100%;
+      padding: 13px 15px;
+      color: #334155;
+      background: #f8fafc;
+      border: 2px solid #e2e8f0;
+      border-radius: 11px;
+      text-align: left;
+      transition: 140ms ease;
+    }
+
+    .quiz-option:hover:not(:disabled) {
+      background: #f1f5ff;
+      border-color: #a5b4fc;
+      transform: translateY(-1px);
+    }
+
+    .quiz-option.selected {
+      color: #1e3a8a;
+      background: #eef2ff;
+      border-color: var(--primary-2);
+    }
+
+    .quiz-option.correct {
+      color: var(--good-ink);
+      background: var(--good-bg);
+      border-color: var(--good-border);
+    }
+
+    .quiz-option.wrong {
+      color: #9f1239;
+      background: #fff1f2;
+      border-color: #fda4af;
+    }
+
+    .option-letter {
+      display: inline-grid;
+      place-items: center;
+      width: 27px;
+      height: 27px;
+      margin-right: 9px;
+      color: white;
+      background: #64748b;
+      border-radius: 50%;
+      font-weight: 800;
+    }
+
+    .quiz-option.selected .option-letter {
+      background: var(--primary);
+    }
+
+    .quiz-option.correct .option-letter {
+      background: #16a34a;
+    }
+
+    .quiz-option.wrong .option-letter {
+      background: #e11d48;
+    }
+
+    .quiz-feedback {
+      margin-top: 18px;
+      padding: 14px;
+      border: 1px solid;
+      border-radius: 11px;
+    }
+
+    .quiz-feedback.good {
+      color: var(--good-ink);
+      background: var(--good-bg);
+      border-color: var(--good-border);
+    }
+
+    .quiz-feedback.warn {
+      color: var(--warn-ink);
+      background: var(--warn-bg);
+      border-color: var(--warn-border);
+    }
+
+    .quiz-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 9px;
+      margin-top: 20px;
+    }
+
+    .quiz-final {
+      display: grid;
+      place-items: center;
+      min-height: 390px;
+      text-align: center;
+    }
+
+    .quiz-final-score {
+      display: grid;
+      place-items: center;
+      width: 150px;
+      height: 150px;
+      margin-bottom: 18px;
+      color: white;
+      background:
+        linear-gradient(135deg, var(--primary), var(--derivative));
+      border: 10px solid #ede9fe;
+      border-radius: 50%;
+      font-size: 2rem;
+      font-weight: 850;
+    }
+
+    .quiz-final h3 {
+      margin-bottom: 5px;
+      font-size: 1.55rem;
+    }
+
+    .quiz-final p {
+      max-width: 620px;
+      color: var(--muted);
+    }
+
+    /* ==========================================================
+       FOOTER AND RESPONSIVE DESIGN
+    ========================================================== */
 
     .site-footer {
       padding: 28px 20px 40px;
@@ -744,12 +1148,20 @@
       color: #334155;
     }
 
+    @media (max-width: 1050px) {
+      .task-tabs {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
     @media (max-width: 960px) {
-      .workspace {
+      .workspace,
+      .quiz-layout {
         grid-template-columns: 1fr;
       }
 
-      .control-card {
+      .control-card,
+      .quiz-sidebar {
         position: static;
       }
 
@@ -784,8 +1196,13 @@
         min-height: 44px;
       }
 
-      .readout-grid {
+      .readout-grid,
+      .input-grid {
         grid-template-columns: 1fr;
+      }
+
+      .input-field.full {
+        grid-column: auto;
       }
 
       .section-heading {
@@ -801,12 +1218,22 @@
       .control-card,
       .plot-card,
       .readout-card,
-      .table-card {
+      .table-card,
+      .quiz-card,
+      .quiz-sidebar {
         border-radius: 12px;
       }
 
       .interactive-plot {
         min-height: 230px;
+      }
+
+      .quiz-actions {
+        flex-direction: column;
+      }
+
+      .quiz-actions button {
+        width: 100%;
       }
     }
 
@@ -822,7 +1249,9 @@
 
     @media print {
       .task-tabs,
-      .control-card button {
+      .control-card button,
+      .quiz-actions,
+      .quiz-sidebar button {
         display: none !important;
       }
 
@@ -831,11 +1260,13 @@
         break-before: page;
       }
 
-      .workspace {
+      .workspace,
+      .quiz-layout {
         grid-template-columns: 1fr;
       }
 
-      .control-card {
+      .control-card,
+      .quiz-sidebar {
         position: static;
       }
 
@@ -857,7 +1288,8 @@
 
       <p class="header-description">
         An interactive companion to Lecture Notes 4. Move points, compare
-        one-sided limits, construct tangent lines and discover derivative curves.
+        one-sided limits, construct tangent lines, discover derivative curves
+        and test your understanding.
       </p>
 
       <div class="lecturer">
@@ -869,17 +1301,34 @@
   </header>
 
   <main class="page-shell">
-    <section class="principle-banner" aria-label="First principle of differentiation">
+    <section
+      class="principle-banner"
+      aria-label="First principle of differentiation"
+    >
       <div class="principle-label">First principle</div>
 
       <div class="principle-equation">
-        f′(a) =
-        lim<sub>h→0</sub>
-        [f(a+h) − f(a)] / h
+        <span class="math-display">
+          <span>f′(a) =</span>
+
+          <span class="math-limit">
+            <span class="math-limit-main">lim</span>
+            <span class="math-limit-sub">h → 0</span>
+          </span>
+
+          <span class="math-frac">
+            <span class="math-num">f(a+h) − f(a)</span>
+            <span class="math-den">h</span>
+          </span>
+        </span>
       </div>
     </section>
 
-    <nav class="task-tabs" role="tablist" aria-label="Interactive calculus tasks">
+    <nav
+      class="task-tabs"
+      role="tablist"
+      aria-label="Interactive calculus tasks"
+    >
       <button
         type="button"
         class="task-tab active"
@@ -912,15 +1361,28 @@
       >
         Task 3 · Piecewise functions
       </button>
+
+      <button
+        type="button"
+        class="task-tab"
+        role="tab"
+        aria-selected="false"
+        aria-controls="task4"
+        data-target="task4"
+      >
+        Task 4 · Self-test
+      </button>
     </nav>
 
-    <!-- =========================================================
+    <!-- =======================================================
          TASK 1
-    ========================================================== -->
+    ======================================================== -->
+
     <section id="task1" class="task-panel active" role="tabpanel">
       <div class="section-heading">
         <div>
           <h2>Task 1 — From a secant line to a tangent line</h2>
+
           <p>
             Choose a function and two points on its graph. Observe how the
             secant slope approaches a limiting value as Q approaches P from
@@ -945,6 +1407,7 @@
             <label class="control-label" for="t1Function">
               Basic function
             </label>
+
             <select id="t1Function"></select>
           </div>
 
@@ -952,16 +1415,35 @@
             <div class="control-label">Exploration mode</div>
 
             <div class="segmented four" id="t1Mode">
-              <button type="button" class="segment-button active" data-mode="free">
+              <button
+                type="button"
+                class="segment-button active"
+                data-mode="free"
+              >
                 Two points
               </button>
-              <button type="button" class="segment-button" data-mode="left">
+
+              <button
+                type="button"
+                class="segment-button"
+                data-mode="left"
+              >
                 Left h→0⁻
               </button>
-              <button type="button" class="segment-button" data-mode="right">
+
+              <button
+                type="button"
+                class="segment-button"
+                data-mode="right"
+              >
                 Right h→0⁺
               </button>
-              <button type="button" class="segment-button" data-mode="both">
+
+              <button
+                type="button"
+                class="segment-button"
+                data-mode="both"
+              >
                 Both sides
               </button>
             </div>
@@ -972,6 +1454,7 @@
               <span>Base point P: x = a</span>
               <output id="t1AValue" class="control-value"></output>
             </label>
+
             <input id="t1A" type="range">
           </div>
 
@@ -980,6 +1463,7 @@
               <span>Second point Q: x = b</span>
               <output id="t1BValue" class="control-value"></output>
             </label>
+
             <input id="t1B" type="range">
           </div>
 
@@ -987,10 +1471,19 @@
             <div class="control-label">A graph click moves</div>
 
             <div class="segmented" id="t1ActivePoint">
-              <button type="button" class="segment-button" data-point="p">
+              <button
+                type="button"
+                class="segment-button"
+                data-point="p"
+              >
                 Point P
               </button>
-              <button type="button" class="segment-button active" data-point="q">
+
+              <button
+                type="button"
+                class="segment-button active"
+                data-point="q"
+              >
                 Point Q
               </button>
             </div>
@@ -1001,22 +1494,37 @@
               <span>Distance |h| from P</span>
               <output id="t1HValue" class="control-value"></output>
             </label>
+
             <input id="t1H" type="range">
+
             <div class="small-note">
-              This is a logarithmic control, so small values of h are easier to explore.
+              This logarithmic control makes small values of h easier to
+              investigate.
             </div>
           </div>
 
           <div class="button-row">
-            <button id="t1Closer" type="button" class="action-button secondary">
+            <button
+              id="t1Closer"
+              type="button"
+              class="action-button secondary"
+            >
               Move Q halfway
             </button>
 
-            <button id="t1Animate" type="button" class="action-button">
+            <button
+              id="t1Animate"
+              type="button"
+              class="action-button"
+            >
               Animate Q → P
             </button>
 
-            <button id="t1Reset" type="button" class="action-button danger">
+            <button
+              id="t1Reset"
+              type="button"
+              class="action-button danger"
+            >
               Reset
             </button>
           </div>
@@ -1038,20 +1546,36 @@
             ></svg>
 
             <div class="legend">
-              <span class="legend-item" style="color: var(--function)">
-                <span class="legend-line"></span> f(x)
+              <span
+                class="legend-item"
+                style="color: var(--function)"
+              >
+                <span class="legend-line"></span>
+                f(x)
               </span>
 
-              <span class="legend-item" style="color: var(--left)">
-                <span class="legend-line dashed"></span> Left secant
+              <span
+                class="legend-item"
+                style="color: var(--left)"
+              >
+                <span class="legend-line dashed"></span>
+                Left secant
               </span>
 
-              <span class="legend-item" style="color: var(--right)">
-                <span class="legend-line dashed"></span> Right secant
+              <span
+                class="legend-item"
+                style="color: var(--right)"
+              >
+                <span class="legend-line dashed"></span>
+                Right secant
               </span>
 
-              <span class="legend-item" style="color: var(--tangent)">
-                <span class="legend-line"></span> Limiting tangent
+              <span
+                class="legend-item"
+                style="color: var(--tangent)"
+              >
+                <span class="legend-line"></span>
+                Limiting tangent
               </span>
             </div>
           </article>
@@ -1072,6 +1596,7 @@
 
       <article class="table-card">
         <h3>Numerical approach from both sides</h3>
+
         <p class="small-note">
           For the left side, h is negative. For the right side, h is positive.
         </p>
@@ -1085,23 +1610,26 @@
                 <th>Right quotient, h&gt;0</th>
               </tr>
             </thead>
+
             <tbody id="t1TableBody"></tbody>
           </table>
         </div>
       </article>
     </section>
 
-    <!-- =========================================================
+    <!-- =======================================================
          TASK 2
-    ========================================================== -->
+    ======================================================== -->
+
     <section id="task2" class="task-panel" role="tabpanel">
       <div class="section-heading">
         <div>
           <h2>Task 2 — Discover and construct the derivative curve</h2>
+
           <p>
-            Move the tangent point along f. The tangent slope becomes the
-            vertical coordinate f′(a) on the derivative graph. Collected
-            slope-points gradually form the graph of f′.
+            Move the tangent point along f. Its tangent slope becomes the
+            vertical coordinate f′(a) on the derivative graph. The collected
+            purple slope-points gradually form the graph of f′.
           </p>
         </div>
 
@@ -1112,6 +1640,8 @@
         <strong>Suggested investigation:</strong>
         Choose <em>f(x)=x²</em>, move the tangent point from left to right,
         and predict the shape of <em>f′(x)</em> before revealing the answer.
+        The student-created derivative is shown in
+        <strong style="color: var(--derivative)">purple</strong>.
       </div>
 
       <div class="workspace">
@@ -1122,6 +1652,7 @@
             <label class="control-label" for="t2Function">
               Basic function
             </label>
+
             <select id="t2Function"></select>
           </div>
 
@@ -1130,6 +1661,7 @@
               <span>Tangent point: x = a</span>
               <output id="t2AValue" class="control-value"></output>
             </label>
+
             <input id="t2A" type="range">
           </div>
 
@@ -1137,10 +1669,19 @@
             <div class="control-label">Finite difference direction</div>
 
             <div class="segmented" id="t2Side">
-              <button type="button" class="segment-button" data-sign="-1">
+              <button
+                type="button"
+                class="segment-button"
+                data-sign="-1"
+              >
                 h&lt;0
               </button>
-              <button type="button" class="segment-button active" data-sign="1">
+
+              <button
+                type="button"
+                class="segment-button active"
+                data-sign="1"
+              >
                 h&gt;0
               </button>
             </div>
@@ -1151,31 +1692,50 @@
               <span>|h| in the first principle</span>
               <output id="t2HValue" class="control-value"></output>
             </label>
+
             <input id="t2H" type="range">
           </div>
 
           <div class="control-group">
             <label class="checkbox-row">
               <input id="t2Collect" type="checkbox" checked>
-              <span>Collect the point (a, f′(a)) while I move the tangent.</span>
+
+              <span>
+                Collect the point (a, f′(a)) while I move the tangent.
+              </span>
             </label>
 
             <label class="checkbox-row">
               <input id="t2ShowAnswer" type="checkbox">
-              <span>Show the complete theoretical derivative curve.</span>
+
+              <span>
+                Show the complete theoretical derivative curve.
+              </span>
             </label>
           </div>
 
           <div class="button-row">
-            <button id="t2Trace" type="button" class="action-button">
+            <button
+              id="t2Trace"
+              type="button"
+              class="action-button"
+            >
               Auto-trace derivative
             </button>
 
-            <button id="t2Clear" type="button" class="action-button secondary">
+            <button
+              id="t2Clear"
+              type="button"
+              class="action-button secondary"
+            >
               Clear collected points
             </button>
 
-            <button id="t2Reset" type="button" class="action-button danger">
+            <button
+              id="t2Reset"
+              type="button"
+              class="action-button danger"
+            >
               Reset
             </button>
           </div>
@@ -1198,24 +1758,36 @@
               ></svg>
 
               <div class="legend">
-                <span class="legend-item" style="color: var(--function)">
-                  <span class="legend-line"></span> f(x)
+                <span
+                  class="legend-item"
+                  style="color: var(--function)"
+                >
+                  <span class="legend-line"></span>
+                  f(x)
                 </span>
 
-                <span class="legend-item" style="color: var(--secant)">
-                  <span class="legend-line dashed"></span> Finite secant
+                <span
+                  class="legend-item"
+                  style="color: var(--secant)"
+                >
+                  <span class="legend-line dashed"></span>
+                  Finite secant
                 </span>
 
-                <span class="legend-item" style="color: var(--tangent)">
-                  <span class="legend-line"></span> Tangent
+                <span
+                  class="legend-item"
+                  style="color: var(--tangent)"
+                >
+                  <span class="legend-line"></span>
+                  Tangent
                 </span>
               </div>
             </article>
 
-            <article class="plot-card">
+            <article class="plot-card derivative-card">
               <div class="plot-heading">
                 <h3>Derivative graph f′(x)</h3>
-                <p>Each tangent slope produces one point.</p>
+                <p>Each tangent slope produces one purple point.</p>
               </div>
 
               <svg
@@ -1227,12 +1799,20 @@
               ></svg>
 
               <div class="legend">
-                <span class="legend-item" style="color: var(--derivative)">
-                  <span class="legend-dot"></span> Collected slope-points
+                <span
+                  class="legend-item"
+                  style="color: var(--derivative)"
+                >
+                  <span class="legend-line thick"></span>
+                  Collected derivative
                 </span>
 
-                <span class="legend-item" style="color: var(--tangent)">
-                  <span class="legend-line"></span> Theoretical f′(x)
+                <span
+                  class="legend-item"
+                  style="color: var(--tangent)"
+                >
+                  <span class="legend-line dashed"></span>
+                  Theoretical f′(x)
                 </span>
               </div>
             </article>
@@ -1253,7 +1833,11 @@
                 </div>
 
                 <div>
-                  <div id="t2DerivativeFormula" class="big-equation"></div>
+                  <div
+                    id="t2DerivativeFormula"
+                    class="big-equation"
+                  ></div>
+
                   <div id="t2Values"></div>
                   <div id="t2Count" class="small-note"></div>
                 </div>
@@ -1264,13 +1848,15 @@
       </div>
     </section>
 
-    <!-- =========================================================
+    <!-- =======================================================
          TASK 3
-    ========================================================== -->
+    ======================================================== -->
+
     <section id="task3" class="task-panel" role="tabpanel">
       <div class="section-heading">
         <div>
           <h2>Task 3 — Left-hand and right-hand derivatives</h2>
+
           <p>
             At a joining point c, a derivative exists only when the function
             is continuous and the left-hand and right-hand derivatives agree.
@@ -1282,8 +1868,8 @@
 
       <div class="try-this">
         <strong>Suggested investigation:</strong>
-        Compare the smooth join with the corner. Then use the custom slope
-        laboratory and press <em>Match the slopes</em>.
+        Compare the smooth join with the corner. Then use Item 4 to adjust
+        two straight-line slopes, or Item 5 to enter two functions of your own.
       </div>
 
       <div class="workspace">
@@ -1296,20 +1882,47 @@
             </label>
 
             <select id="t3Piece">
-              <option value="smooth">1. Smooth join — derivative exists</option>
-              <option value="corner">2. Corner — derivatives disagree</option>
-              <option value="jump">3. Jump — not continuous</option>
-              <option value="custom">4. Build your own joined lines</option>
+              <option value="smooth">
+                1. Smooth join — derivative exists
+              </option>
+
+              <option value="corner">
+                2. Corner — derivatives disagree
+              </option>
+
+              <option value="jump">
+                3. Jump — not continuous
+              </option>
+
+              <option value="lines">
+                4. Build your own joined lines
+              </option>
+
+              <option value="functions">
+                5. Enter two functions
+              </option>
             </select>
           </div>
 
-          <div id="t3CustomPanel" class="custom-panel control-group" hidden>
+          <div
+            id="t3LinePanel"
+            class="custom-panel control-group"
+            hidden
+          >
             <div class="control-group">
               <label class="control-label" for="t3ML">
                 <span>Left slope m<sub>L</sub></span>
                 <output id="t3MLValue" class="control-value"></output>
               </label>
-              <input id="t3ML" type="range" min="-4" max="4" step="0.1" value="-1">
+
+              <input
+                id="t3ML"
+                type="range"
+                min="-4"
+                max="4"
+                step="0.1"
+                value="-1"
+              >
             </div>
 
             <div class="control-group">
@@ -1317,12 +1930,141 @@
                 <span>Right slope m<sub>R</sub></span>
                 <output id="t3MRValue" class="control-value"></output>
               </label>
-              <input id="t3MR" type="range" min="-4" max="4" step="0.1" value="2">
+
+              <input
+                id="t3MR"
+                type="range"
+                min="-4"
+                max="4"
+                step="0.1"
+                value="2"
+              >
             </div>
 
-            <button id="t3Match" type="button" class="action-button secondary">
+            <button
+              id="t3Match"
+              type="button"
+              class="action-button secondary"
+            >
               Match the slopes
             </button>
+          </div>
+
+          <div
+            id="t3FunctionPanel"
+            class="custom-panel control-group"
+            hidden
+          >
+            <div class="input-grid">
+              <div class="input-field full">
+                <label for="t3LeftExpression">
+                  Left function, x ≤ c
+                </label>
+
+                <input
+                  id="t3LeftExpression"
+                  class="field-input code-input"
+                  type="text"
+                  value="x^2"
+                  spellcheck="false"
+                >
+              </div>
+
+              <div class="input-field full">
+                <label for="t3RightExpression">
+                  Right function, x &gt; c
+                </label>
+
+                <input
+                  id="t3RightExpression"
+                  class="field-input code-input"
+                  type="text"
+                  value="2*x-1"
+                  spellcheck="false"
+                >
+              </div>
+
+              <div class="input-field">
+                <label for="t3Join">Joining point c</label>
+
+                <input
+                  id="t3Join"
+                  class="field-input"
+                  type="number"
+                  value="1"
+                  step="0.1"
+                >
+              </div>
+
+              <div class="input-field">
+                <label for="t3Window">Viewing half-width</label>
+
+                <input
+                  id="t3Window"
+                  class="field-input"
+                  type="number"
+                  value="4"
+                  min="1"
+                  max="20"
+                  step="0.5"
+                >
+              </div>
+            </div>
+
+            <div class="button-row">
+              <button
+                id="t3ApplyFunctions"
+                type="button"
+                class="action-button"
+              >
+                Apply functions
+              </button>
+            </div>
+
+            <div class="expression-examples">
+              <button
+                type="button"
+                class="example-button"
+                data-left="x^2"
+                data-right="2*x-1"
+                data-c="1"
+              >
+                Smooth example
+              </button>
+
+              <button
+                type="button"
+                class="example-button"
+                data-left="-x"
+                data-right="x"
+                data-c="0"
+              >
+                Corner example
+              </button>
+
+              <button
+                type="button"
+                class="example-button"
+                data-left="x^2+1"
+                data-right="x"
+                data-c="0"
+              >
+                Jump example
+              </button>
+            </div>
+
+            <p class="small-note">
+              Supported notation includes
+              <code>x^2</code>, <code>sin(x)</code>, <code>cos(x)</code>,
+              <code>tan(x)</code>, <code>exp(x)</code>,
+              <code>ln(x)</code>, <code>sqrt(x)</code>,
+              <code>abs(x)</code>, <code>pi</code> and <code>e</code>.
+              Implicit multiplication such as <code>2x</code> is accepted.
+            </p>
+
+            <div id="t3FunctionStatus" class="small-note">
+              Enter two functions and press “Apply functions”.
+            </div>
           </div>
 
           <div class="control-group">
@@ -1339,15 +2081,27 @@
           </div>
 
           <div class="button-row">
-            <button id="t3Closer" type="button" class="action-button secondary">
+            <button
+              id="t3Closer"
+              type="button"
+              class="action-button secondary"
+            >
               Halve |h|
             </button>
 
-            <button id="t3Animate" type="button" class="action-button">
+            <button
+              id="t3Animate"
+              type="button"
+              class="action-button"
+            >
               Animate h → 0
             </button>
 
-            <button id="t3Reset" type="button" class="action-button danger">
+            <button
+              id="t3Reset"
+              type="button"
+              class="action-button danger"
+            >
               Reset
             </button>
           </div>
@@ -1357,7 +2111,10 @@
           <article class="plot-card">
             <div class="plot-heading">
               <h3>One-sided secant lines at the joining point</h3>
-              <p>Blue approaches from the left; red approaches from the right.</p>
+
+              <p>
+                Blue approaches from the left; red approaches from the right.
+              </p>
             </div>
 
             <svg
@@ -1369,20 +2126,36 @@
             ></svg>
 
             <div class="legend">
-              <span class="legend-item" style="color: var(--left)">
-                <span class="legend-line"></span> Left branch
+              <span
+                class="legend-item"
+                style="color: var(--left)"
+              >
+                <span class="legend-line"></span>
+                Left branch
               </span>
 
-              <span class="legend-item" style="color: var(--right)">
-                <span class="legend-line"></span> Right branch
+              <span
+                class="legend-item"
+                style="color: var(--right)"
+              >
+                <span class="legend-line"></span>
+                Right branch
               </span>
 
-              <span class="legend-item" style="color: var(--left)">
-                <span class="legend-line dashed"></span> Left secant
+              <span
+                class="legend-item"
+                style="color: var(--left)"
+              >
+                <span class="legend-line dashed"></span>
+                Left secant
               </span>
 
-              <span class="legend-item" style="color: var(--right)">
-                <span class="legend-line dashed"></span> Right secant
+              <span
+                class="legend-item"
+                style="color: var(--right)"
+              >
+                <span class="legend-line dashed"></span>
+                Right secant
               </span>
             </div>
           </article>
@@ -1414,10 +2187,78 @@
                 <th>[f(c+r)−f(c)]/r</th>
               </tr>
             </thead>
+
             <tbody id="t3TableBody"></tbody>
           </table>
         </div>
       </article>
+    </section>
+
+    <!-- =======================================================
+         TASK 4
+    ======================================================== -->
+
+    <section id="task4" class="task-panel" role="tabpanel">
+      <div class="section-heading">
+        <div>
+          <h2>Task 4 — Check your understanding</h2>
+
+          <p>
+            Complete a randomized multiple-choice test covering secant lines,
+            the first principle, differentiation rules and one-sided
+            derivatives. Each answer includes an explanation.
+          </p>
+        </div>
+
+        <div class="task-number">4</div>
+      </div>
+
+      <div class="try-this">
+        <strong>Instructions:</strong>
+        Select an answer, press <em>Check answer</em>, read the explanation,
+        and then continue to the next question.
+      </div>
+
+      <div class="quiz-layout">
+        <aside class="quiz-sidebar">
+          <h3>Test progress</h3>
+
+          <div class="quiz-score">
+            <div>
+              <div id="quizScore" class="quiz-score-number">0 / 10</div>
+              <div class="quiz-score-label">Current score</div>
+            </div>
+          </div>
+
+          <div id="quizProgressText" class="small-note">
+            0 of 10 questions completed
+          </div>
+
+          <div
+            class="progress-track"
+            role="progressbar"
+            aria-label="Quiz progress"
+          >
+            <div id="quizProgressBar" class="progress-fill"></div>
+          </div>
+
+          <div id="quizTopicSummary" class="topic-summary"></div>
+
+          <button
+            id="quizRestart"
+            type="button"
+            class="action-button secondary"
+          >
+            Start a new test
+          </button>
+        </aside>
+
+        <article
+          id="quizMain"
+          class="quiz-card"
+          aria-live="polite"
+        ></article>
+      </div>
     </section>
   </main>
 
@@ -1442,7 +2283,23 @@
     const clamp = (value, minimum, maximum) =>
       Math.min(maximum, Math.max(minimum, value));
 
-    const isFiniteNumber = value => Number.isFinite(value);
+    const prefersReducedMotion =
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    function escapeHTML(value) {
+      const replacements = {
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;"
+      };
+
+      return String(value).replace(
+        /[&<>"']/g,
+        character => replacements[character]
+      );
+    }
 
     function formatNumber(value, digits = 5) {
       if (Number.isNaN(value)) return "undefined";
@@ -1459,7 +2316,9 @@
           .replace("e-", " × 10^−");
       }
 
-      return Number(value.toFixed(digits)).toString().replace("-", "−");
+      return Number(value.toFixed(digits))
+        .toString()
+        .replace("-", "−");
     }
 
     function formatTick(value) {
@@ -1475,24 +2334,23 @@
         absolute < 1 ? 2 :
         absolute < 10 ? 1 : 0;
 
-      return Number(value.toFixed(digits)).toString().replace("-", "−");
-    }
-
-    function escapeXML(text) {
-      return String(text)
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;");
+      return Number(value.toFixed(digits))
+        .toString()
+        .replace("-", "−");
     }
 
     function approximatelyEqual(a, b, tolerance = 1e-6) {
       if (!Number.isFinite(a) || !Number.isFinite(b)) return false;
-      return Math.abs(a - b) <= tolerance * (1 + Math.max(Math.abs(a), Math.abs(b)));
+
+      return (
+        Math.abs(a - b) <=
+        tolerance * (1 + Math.max(Math.abs(a), Math.abs(b)))
+      );
     }
 
     function setStatus(element, type, heading, body) {
       element.className = `status-box ${type}`;
+
       element.innerHTML = `
         <strong>${heading}</strong>
         <div>${body}</div>
@@ -1519,7 +2377,11 @@
       const first = Math.ceil((minimum - 1e-12) / step) * step;
       const values = [];
 
-      for (let value = first; value <= maximum + step * 0.2; value += step) {
+      for (
+        let value = first;
+        value <= maximum + step * 0.2;
+        value += step
+      ) {
         values.push(Number(value.toPrecision(12)));
       }
 
@@ -1540,20 +2402,34 @@
       input.min = Math.log10(safeMinimum);
       input.max = Math.log10(safeMaximum);
       input.step = 0.01;
-      input.value = Math.log10(clamp(value, safeMinimum, safeMaximum));
+      input.value = Math.log10(
+        clamp(value, safeMinimum, safeMaximum)
+      );
     }
 
     function logSliderValue(input) {
       return Math.pow(10, Number(input.value));
     }
 
+    function safeEvaluate(fn, x) {
+      try {
+        return Number(fn(x));
+      } catch {
+        return NaN;
+      }
+    }
+
     function differenceQuotient(functionEntry, a, h) {
-      if (!Number.isFinite(h) || Math.abs(h) < 1e-14) return NaN;
+      if (!Number.isFinite(h) || Math.abs(h) < 1e-14) {
+        return NaN;
+      }
 
-      const fa = functionEntry.f(a);
-      const fb = functionEntry.f(a + h);
+      const fa = safeEvaluate(functionEntry.f, a);
+      const fb = safeEvaluate(functionEntry.f, a + h);
 
-      if (!Number.isFinite(fa) || !Number.isFinite(fb)) return NaN;
+      if (!Number.isFinite(fa) || !Number.isFinite(fb)) {
+        return NaN;
+      }
 
       return (fb - fa) / h;
     }
@@ -1584,13 +2460,28 @@
       };
     }
 
-    const prefersReducedMotion =
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    function firstPrincipleHTML(variable = "a") {
+      return `
+        <span class="math-display compact">
+          <span>f′(${variable}) =</span>
+
+          <span class="math-limit">
+            <span class="math-limit-main">lim</span>
+            <span class="math-limit-sub">h → 0</span>
+          </span>
+
+          <span class="math-frac">
+            <span class="math-num">
+              f(${variable}+h) − f(${variable})
+            </span>
+            <span class="math-den">h</span>
+          </span>
+        </span>
+      `;
+    }
 
     /* ============================================================
        FUNCTION LIBRARY
-
-       To add another function, add an object to this array.
     ============================================================ */
 
     const FUNCTIONS = [
@@ -1763,16 +2654,39 @@
       return FUNCTIONS.find(entry => entry.id === id);
     }
 
+    for (const select of [byId("t1Function"), byId("t2Function")]) {
+      for (const entry of FUNCTIONS) {
+        const option = document.createElement("option");
+
+        option.value = entry.id;
+        option.textContent =
+          `${entry.name} — ${entry.formulaText}`;
+
+        select.appendChild(option);
+      }
+    }
+
     /* ============================================================
        SVG PLOT CLASS
     ============================================================ */
+
+    const COLORS = {
+      function: "#3157b7",
+      left: "#0284c7",
+      right: "#e11d48",
+      secant: "#f59e0b",
+      tangent: "#059669",
+      derivative: "#7c3aed",
+      derivativeDark: "#4c1d95",
+      dark: "#172033",
+      grey: "#94a3b8"
+    };
 
     let plotCounter = 0;
 
     class SVGPlot {
       constructor(svg) {
         this.svg = svg;
-
         this.width = 760;
         this.height = 430;
 
@@ -1794,21 +2708,26 @@
         this.yMin = yMin;
         this.yMax = yMax;
 
-        this.plotWidth = this.width - this.margin.left - this.margin.right;
-        this.plotHeight = this.height - this.margin.top - this.margin.bottom;
+        this.plotWidth =
+          this.width - this.margin.left - this.margin.right;
+
+        this.plotHeight =
+          this.height - this.margin.top - this.margin.bottom;
       }
 
       sx(x) {
         return (
           this.margin.left +
-          ((x - this.xMin) / (this.xMax - this.xMin)) * this.plotWidth
+          ((x - this.xMin) / (this.xMax - this.xMin)) *
+          this.plotWidth
         );
       }
 
       sy(y) {
         return (
           this.margin.top +
-          ((this.yMax - y) / (this.yMax - this.yMin)) * this.plotHeight
+          ((this.yMax - y) / (this.yMax - this.yMin)) *
+          this.plotHeight
         );
       }
 
@@ -1816,7 +2735,8 @@
         const rect = this.svg.getBoundingClientRect();
 
         const viewX =
-          ((event.clientX - rect.left) / rect.width) * this.width;
+          ((event.clientX - rect.left) / rect.width) *
+          this.width;
 
         const x =
           this.xMin +
@@ -1862,8 +2782,10 @@
           markup += `
             <line
               class="plot-grid"
-              x1="${x}" y1="${this.margin.top}"
-              x2="${x}" y2="${this.margin.top + this.plotHeight}"
+              x1="${x}"
+              y1="${this.margin.top}"
+              x2="${x}"
+              y2="${this.margin.top + this.plotHeight}"
               stroke="#e8edf4"
               stroke-width="1"
             ></line>
@@ -1875,7 +2797,7 @@
               fill="#64748b"
               font-size="12"
               text-anchor="middle"
-            >${escapeXML(formatTick(tick))}</text>
+            >${escapeHTML(formatTick(tick))}</text>
           `;
         }
 
@@ -1885,8 +2807,10 @@
           markup += `
             <line
               class="plot-grid"
-              x1="${this.margin.left}" y1="${y}"
-              x2="${this.margin.left + this.plotWidth}" y2="${y}"
+              x1="${this.margin.left}"
+              y1="${y}"
+              x2="${this.margin.left + this.plotWidth}"
+              y2="${y}"
               stroke="#e8edf4"
               stroke-width="1"
             ></line>
@@ -1898,7 +2822,7 @@
               fill="#64748b"
               font-size="12"
               text-anchor="end"
-            >${escapeXML(formatTick(tick))}</text>
+            >${escapeHTML(formatTick(tick))}</text>
           `;
         }
 
@@ -1908,8 +2832,10 @@
           markup += `
             <line
               class="plot-axis"
-              x1="${x0}" y1="${this.margin.top}"
-              x2="${x0}" y2="${this.margin.top + this.plotHeight}"
+              x1="${x0}"
+              y1="${this.margin.top}"
+              x2="${x0}"
+              y2="${this.margin.top + this.plotHeight}"
               stroke="#64748b"
               stroke-width="1.4"
             ></line>
@@ -1922,8 +2848,10 @@
           markup += `
             <line
               class="plot-axis"
-              x1="${this.margin.left}" y1="${y0}"
-              x2="${this.margin.left + this.plotWidth}" y2="${y0}"
+              x1="${this.margin.left}"
+              y1="${y0}"
+              x2="${this.margin.left + this.plotWidth}"
+              y2="${y0}"
               stroke="#64748b"
               stroke-width="1.4"
             ></line>
@@ -1959,6 +2887,7 @@
 
         this.svg.innerHTML = `
           ${this.baseMarkup()}
+
           <g clip-path="url(#${this.clipId})">
             ${layers.join("")}
           </g>
@@ -1969,26 +2898,21 @@
         const from = options.from ?? this.xMin;
         const to = options.to ?? this.xMax;
         const samples = options.samples ?? 700;
-        const color = options.color ?? "#3157b7";
+        const color = options.color ?? COLORS.function;
         const width = options.width ?? 3;
         const dash = options.dash ?? "";
         const opacity = options.opacity ?? 1;
+        const className = options.className ?? "";
 
         const yRange = this.yMax - this.yMin;
+
         let path = "";
         let drawing = false;
         let previousY = null;
 
         for (let i = 0; i <= samples; i++) {
           const x = from + ((to - from) * i) / samples;
-
-          let y;
-
-          try {
-            y = fn(x);
-          } catch {
-            y = NaN;
-          }
+          const y = safeEvaluate(fn, x);
 
           const valid =
             Number.isFinite(y) &&
@@ -2010,7 +2934,9 @@
 
           const command = drawing ? "L" : "M";
 
-          path += `${command}${this.sx(x).toFixed(2)},${this.sy(y).toFixed(2)} `;
+          path +=
+            `${command}${this.sx(x).toFixed(2)},` +
+            `${this.sy(y).toFixed(2)} `;
 
           drawing = true;
           previousY = y;
@@ -2018,7 +2944,7 @@
 
         return `
           <path
-            class="plot-curve"
+            class="plot-curve ${className}"
             d="${path}"
             fill="none"
             stroke="${color}"
@@ -2033,43 +2959,46 @@
       }
 
       lineThrough(x0, y0, slope, options = {}) {
-        if (!Number.isFinite(slope)) return "";
-
-        const color = options.color ?? "#059669";
-        const width = options.width ?? 2.5;
-        const dash = options.dash ?? "";
-        const opacity = options.opacity ?? 1;
+        if (
+          !Number.isFinite(x0) ||
+          !Number.isFinite(y0) ||
+          !Number.isFinite(slope)
+        ) {
+          return "";
+        }
 
         const y1 = y0 + slope * (this.xMin - x0);
         const y2 = y0 + slope * (this.xMax - x0);
 
         return `
           <line
-            class="plot-line"
+            class="plot-line ${options.className ?? ""}"
             x1="${this.sx(this.xMin)}"
             y1="${this.sy(y1)}"
             x2="${this.sx(this.xMax)}"
             y2="${this.sy(y2)}"
-            stroke="${color}"
-            stroke-width="${width}"
-            stroke-dasharray="${dash}"
-            opacity="${opacity}"
+            stroke="${options.color ?? COLORS.tangent}"
+            stroke-width="${options.width ?? 2.5}"
+            stroke-dasharray="${options.dash ?? ""}"
+            opacity="${options.opacity ?? 1}"
             vector-effect="non-scaling-stroke"
           ></line>
         `;
       }
 
       segment(x1, y1, x2, y2, options = {}) {
-        if (![x1, y1, x2, y2].every(Number.isFinite)) return "";
+        if (![x1, y1, x2, y2].every(Number.isFinite)) {
+          return "";
+        }
 
         return `
           <line
-            class="plot-line"
+            class="plot-line ${options.className ?? ""}"
             x1="${this.sx(x1)}"
             y1="${this.sy(y1)}"
             x2="${this.sx(x2)}"
             y2="${this.sy(y2)}"
-            stroke="${options.color ?? "#64748b"}"
+            stroke="${options.color ?? COLORS.grey}"
             stroke-width="${options.width ?? 2.5}"
             stroke-dasharray="${options.dash ?? ""}"
             opacity="${options.opacity ?? 1}"
@@ -2079,24 +3008,35 @@
       }
 
       point(x, y, options = {}) {
-        if (!Number.isFinite(x) || !Number.isFinite(y)) return "";
+        if (!Number.isFinite(x) || !Number.isFinite(y)) {
+          return "";
+        }
 
-        const color = options.color ?? "#172033";
+        const color = options.color ?? COLORS.dark;
         const radius = options.radius ?? 6;
         const label = options.label ?? "";
         const handle = options.handle ?? "";
         const open = options.open ?? false;
         const title = options.title ?? "";
+        const className = options.className ?? "";
 
-        const fill = open ? "#ffffff" : color;
-        const stroke = open ? color : "#ffffff";
-        const strokeWidth = open ? 3 : 2.2;
+        const fill =
+          options.fillColor ??
+          (open ? "#ffffff" : color);
+
+        const stroke =
+          options.strokeColor ??
+          (open ? color : "#ffffff");
+
+        const strokeWidth =
+          options.strokeWidth ??
+          (open ? 3 : 2.2);
 
         return `
           <g>
             <circle
-              class="plot-point ${handle ? "draggable" : ""}"
-              ${handle ? `data-handle="${escapeXML(handle)}"` : ""}
+              class="plot-point ${handle ? "draggable" : ""} ${className}"
+              ${handle ? `data-handle="${escapeHTML(handle)}"` : ""}
               cx="${this.sx(x)}"
               cy="${this.sy(y)}"
               r="${radius}"
@@ -2105,7 +3045,11 @@
               stroke-width="${strokeWidth}"
               vector-effect="non-scaling-stroke"
             >
-              ${title ? `<title>${escapeXML(title)}</title>` : ""}
+              ${
+                title
+                  ? `<title>${escapeHTML(title)}</title>`
+                  : ""
+              }
             </circle>
 
             ${
@@ -2118,7 +3062,7 @@
                     fill="${color}"
                     font-size="14"
                     font-weight="800"
-                  >${escapeXML(label)}</text>
+                  >${escapeHTML(label)}</text>
                 `
                 : ""
             }
@@ -2129,9 +3073,6 @@
       polyline(points, options = {}) {
         if (!points.length) return "";
 
-        const color = options.color ?? "#7c3aed";
-        const width = options.width ?? 2.2;
-        const opacity = options.opacity ?? 0.85;
         const maxDx = options.maxDx ?? Infinity;
         const maxDy = options.maxDy ?? Infinity;
 
@@ -2139,7 +3080,10 @@
         let previous = null;
 
         for (const point of points) {
-          if (!Number.isFinite(point.x) || !Number.isFinite(point.y)) {
+          if (
+            !Number.isFinite(point.x) ||
+            !Number.isFinite(point.y)
+          ) {
             previous = null;
             continue;
           }
@@ -2151,50 +3095,29 @@
               Math.abs(point.y - previous.y) > maxDy
             );
 
-          const command = !previous || shouldBreak ? "M" : "L";
+          const command =
+            !previous || shouldBreak ? "M" : "L";
 
-          path += `${command}${this.sx(point.x).toFixed(2)},${this.sy(point.y).toFixed(2)} `;
+          path +=
+            `${command}${this.sx(point.x).toFixed(2)},` +
+            `${this.sy(point.y).toFixed(2)} `;
 
           previous = point;
         }
 
         return `
           <path
-            class="plot-curve"
+            class="plot-curve ${options.className ?? ""}"
             d="${path}"
             fill="none"
-            stroke="${color}"
-            stroke-width="${width}"
-            opacity="${opacity}"
+            stroke="${options.color ?? COLORS.derivative}"
+            stroke-width="${options.width ?? 2.2}"
+            opacity="${options.opacity ?? 1}"
             stroke-linecap="round"
             stroke-linejoin="round"
             vector-effect="non-scaling-stroke"
           ></path>
         `;
-      }
-    }
-
-    const COLORS = {
-      function: "#3157b7",
-      left: "#0284c7",
-      right: "#e11d48",
-      secant: "#f59e0b",
-      tangent: "#059669",
-      derivative: "#7c3aed",
-      dark: "#172033",
-      grey: "#94a3b8"
-    };
-
-    /* ============================================================
-       POPULATE FUNCTION MENUS
-    ============================================================ */
-
-    for (const select of [byId("t1Function"), byId("t2Function")]) {
-      for (const entry of FUNCTIONS) {
-        const option = document.createElement("option");
-        option.value = entry.id;
-        option.textContent = `${entry.name} — ${entry.formulaText}`;
-        select.appendChild(option);
       }
     }
 
@@ -2306,9 +3229,11 @@
 
     function setTask1B(value) {
       const fn = task1Function();
+
       task1State.b = clamp(value, fn.xMin, fn.xMax);
 
-      const smallest = (fn.xMax - fn.xMin) / 10000;
+      const smallest =
+        (fn.xMax - fn.xMin) / 10000;
 
       if (Math.abs(task1State.b - task1State.a) < smallest) {
         const rightCandidate = task1State.a + smallest;
@@ -2321,14 +3246,17 @@
     }
 
     function syncTask1Controls() {
-      const fn = task1Function();
-
       byId("t1A").value = task1State.a;
       byId("t1B").value = task1State.b;
 
-      byId("t1AValue").textContent = formatNumber(task1State.a, 4);
-      byId("t1BValue").textContent = formatNumber(task1State.b, 4);
-      byId("t1HValue").textContent = formatNumber(task1SafeH(), 5);
+      byId("t1AValue").textContent =
+        formatNumber(task1State.a, 4);
+
+      byId("t1BValue").textContent =
+        formatNumber(task1State.b, 4);
+
+      byId("t1HValue").textContent =
+        formatNumber(task1SafeH(), 5);
 
       const isFree = task1State.mode === "free";
 
@@ -2336,14 +3264,20 @@
       byId("t1ActiveGroup").hidden = !isFree;
       byId("t1HGroup").hidden = isFree;
 
-      for (const button of byId("t1Mode").querySelectorAll("button")) {
+      for (
+        const button of
+        byId("t1Mode").querySelectorAll("button")
+      ) {
         button.classList.toggle(
           "active",
           button.dataset.mode === task1State.mode
         );
       }
 
-      for (const button of byId("t1ActivePoint").querySelectorAll("button")) {
+      for (
+        const button of
+        byId("t1ActivePoint").querySelectorAll("button")
+      ) {
         button.classList.toggle(
           "active",
           button.dataset.point === task1State.activePoint
@@ -2354,7 +3288,9 @@
         isFree ? "Move Q halfway" : "Halve |h|";
 
       byId("t1Animate").textContent =
-        task1State.animation ? "Stop animation" : "Animate Q → P";
+        task1State.animation
+          ? "Stop animation"
+          : "Animate Q → P";
     }
 
     function renderTask1Table() {
@@ -2368,34 +3304,62 @@
         range * 0.0008
       ];
 
-      const rows = magnitudes.map(magnitude => {
-        const leftAvailable = task1State.a - magnitude >= fn.xMin;
-        const rightAvailable = task1State.a + magnitude <= fn.xMax;
+      byId("t1TableBody").innerHTML =
+        magnitudes.map(magnitude => {
+          const leftAvailable =
+            task1State.a - magnitude >= fn.xMin;
 
-        const left = leftAvailable
-          ? differenceQuotient(fn, task1State.a, -magnitude)
-          : NaN;
+          const rightAvailable =
+            task1State.a + magnitude <= fn.xMax;
 
-        const right = rightAvailable
-          ? differenceQuotient(fn, task1State.a, magnitude)
-          : NaN;
+          const left = leftAvailable
+            ? differenceQuotient(
+                fn,
+                task1State.a,
+                -magnitude
+              )
+            : NaN;
 
-        return `
-          <tr>
-            <td>${formatNumber(magnitude, 6)}</td>
-            <td>${leftAvailable ? formatNumber(left, 7) : "—"}</td>
-            <td>${rightAvailable ? formatNumber(right, 7) : "—"}</td>
-          </tr>
-        `;
-      });
+          const right = rightAvailable
+            ? differenceQuotient(
+                fn,
+                task1State.a,
+                magnitude
+              )
+            : NaN;
 
-      byId("t1TableBody").innerHTML = rows.join("");
+          return `
+            <tr>
+              <td>${formatNumber(magnitude, 6)}</td>
+
+              <td>
+                ${
+                  leftAvailable
+                    ? formatNumber(left, 7)
+                    : "—"
+                }
+              </td>
+
+              <td>
+                ${
+                  rightAvailable
+                    ? formatNumber(right, 7)
+                    : "—"
+                }
+              </td>
+            </tr>
+          `;
+        }).join("");
     }
 
     function renderTask1Status() {
       const fn = task1Function();
-      const left = sideDerivativeEstimate(fn, task1State.a, -1);
-      const right = sideDerivativeEstimate(fn, task1State.a, 1);
+
+      const left =
+        sideDerivativeEstimate(fn, task1State.a, -1);
+
+      const right =
+        sideDerivativeEstimate(fn, task1State.a, 1);
 
       if (task1State.mode === "free") {
         setStatus(
@@ -2403,10 +3367,12 @@
           "info",
           "A secant is an average rate of change",
           `
-            Move Q closer to P. If the secant slopes approach one number,
-            that number is the tangent slope f′(${formatNumber(task1State.a, 4)}).
+            Move Q closer to P. If the secant slopes approach one
+            number, that number is the tangent slope
+            f′(${formatNumber(task1State.a, 4)}).
           `
         );
+
         return;
       }
 
@@ -2416,8 +3382,9 @@
             byId("t1Status"),
             "warn",
             "No left-side interval is available",
-            "Move P away from the left endpoint of the displayed domain."
+            "Move P away from the left endpoint."
           );
+
           return;
         }
 
@@ -2428,10 +3395,11 @@
           `
             The left-hand secant slopes approach approximately
             <strong>${formatNumber(left.value, 7)}</strong>.
-            A full derivative also requires the right-hand derivative to exist
-            and have the same value.
+            A two-sided derivative also requires the right-hand
+            derivative to have the same value.
           `
         );
+
         return;
       }
 
@@ -2441,8 +3409,9 @@
             byId("t1Status"),
             "warn",
             "No right-side interval is available",
-            "Move P away from the right endpoint of the displayed domain."
+            "Move P away from the right endpoint."
           );
+
           return;
         }
 
@@ -2453,10 +3422,11 @@
           `
             The right-hand secant slopes approach approximately
             <strong>${formatNumber(right.value, 7)}</strong>.
-            A full derivative also requires the left-hand derivative to exist
-            and have the same value.
+            A two-sided derivative also requires the left-hand
+            derivative to have the same value.
           `
         );
+
         return;
       }
 
@@ -2467,20 +3437,30 @@
           "A two-sided comparison is unavailable",
           "Move P into the interior of the displayed domain."
         );
+
         return;
       }
 
       const tolerance =
-        0.003 * (1 + Math.max(Math.abs(left.value), Math.abs(right.value)));
+        0.003 *
+        (
+          1 +
+          Math.max(
+            Math.abs(left.value),
+            Math.abs(right.value)
+          )
+        );
 
       const agree =
         Math.abs(left.value - right.value) <= tolerance;
 
       if (agree) {
         const exact = fn.df(task1State.a);
-        const derivativeValue = Number.isFinite(exact)
-          ? exact
-          : (left.value + right.value) / 2;
+
+        const derivativeValue =
+          Number.isFinite(exact)
+            ? exact
+            : (left.value + right.value) / 2;
 
         setStatus(
           byId("t1Status"),
@@ -2490,8 +3470,11 @@
             Left ≈ ${formatNumber(left.value, 7)} and
             right ≈ ${formatNumber(right.value, 7)}.
             Therefore, the derivative appears to exist and
-            f′(${formatNumber(task1State.a, 4)}) =
-            <strong>${formatNumber(derivativeValue, 7)}</strong>.
+
+            <strong>
+              f′(${formatNumber(task1State.a, 4)}) =
+              ${formatNumber(derivativeValue, 7)}
+            </strong>.
           `
         );
       } else {
@@ -2532,7 +3515,9 @@
       if (task1State.mode === "free") {
         const h = task1State.b - task1State.a;
         const fb = fn.f(task1State.b);
-        const slope = differenceQuotient(fn, task1State.a, h);
+
+        const slope =
+          differenceQuotient(fn, task1State.a, h);
 
         layers.push(
           task1Plot.lineThrough(
@@ -2555,8 +3540,7 @@
               color: COLORS.dark,
               radius: 7,
               label: "P",
-              handle: "p",
-              title: `P(${formatNumber(task1State.a)}, ${formatNumber(fa)})`
+              handle: "p"
             }
           )
         );
@@ -2569,8 +3553,7 @@
               color: COLORS.secant,
               radius: 7,
               label: "Q",
-              handle: "q",
-              title: `Q(${formatNumber(task1State.b)}, ${formatNumber(fb)})`
+              handle: "q"
             }
           )
         );
@@ -2585,7 +3568,8 @@
             m<sub>PQ</sub> =
             [${formatNumber(fb, 7)} − ${formatNumber(fa, 7)}]
             /
-            [${formatNumber(task1State.b, 7)} − ${formatNumber(task1State.a, 7)}]
+            [${formatNumber(task1State.b, 7)} −
+            ${formatNumber(task1State.a, 7)}]
             =
             <strong>${formatNumber(slope, 7)}</strong>
           </div>
@@ -2600,6 +3584,7 @@
         `;
       } else {
         const magnitude = task1SafeH();
+
         const leftNeeded =
           task1State.mode === "left" ||
           task1State.mode === "both";
@@ -2614,7 +3599,9 @@
           const h = -magnitude;
           const qx = task1State.a + h;
           const qy = fn.f(qx);
-          const slope = differenceQuotient(fn, task1State.a, h);
+
+          const slope =
+            differenceQuotient(fn, task1State.a, h);
 
           layers.push(
             task1Plot.lineThrough(
@@ -2655,7 +3642,9 @@
           const h = magnitude;
           const qx = task1State.a + h;
           const qy = fn.f(qx);
-          const slope = differenceQuotient(fn, task1State.a, h);
+
+          const slope =
+            differenceQuotient(fn, task1State.a, h);
 
           layers.push(
             task1Plot.lineThrough(
@@ -2707,39 +3696,6 @@
               }
             )
           );
-        } else {
-          const leftEstimate = sideDerivativeEstimate(fn, task1State.a, -1);
-          const rightEstimate = sideDerivativeEstimate(fn, task1State.a, 1);
-
-          if (leftNeeded && leftEstimate.available) {
-            layers.push(
-              task1Plot.lineThrough(
-                task1State.a,
-                fa,
-                leftEstimate.value,
-                {
-                  color: COLORS.left,
-                  width: 2,
-                  opacity: 0.55
-                }
-              )
-            );
-          }
-
-          if (rightNeeded && rightEstimate.available) {
-            layers.push(
-              task1Plot.lineThrough(
-                task1State.a,
-                fa,
-                rightEstimate.value,
-                {
-                  color: COLORS.right,
-                  width: 2,
-                  opacity: 0.55
-                }
-              )
-            );
-          }
         }
 
         layers.push(
@@ -2756,12 +3712,7 @@
         );
 
         byId("t1Formula").innerHTML = `
-          <div class="big-equation">
-            f′(a) =
-            lim<sub>h→0</sub>
-            [f(a+h)−f(a)]/h
-          </div>
-
+          ${firstPrincipleHTML("a")}
           ${formulaLines.join("")}
         `;
       }
@@ -2780,7 +3731,6 @@
 
       cancelAnimationFrame(task1State.animation.frame);
       task1State.animation = null;
-      byId("t1Animate").textContent = "Animate Q → P";
     }
 
     function startTask1Animation() {
@@ -2801,38 +3751,19 @@
 
       if (task1State.mode === "free") {
         let delta = task1State.b - task1State.a;
+
         direction = Math.sign(delta) || 1;
-
-        let available =
-          direction > 0
-            ? fn.xMax - task1State.a
-            : task1State.a - fn.xMin;
-
-        if (available < range * 0.03) {
-          direction *= -1;
-          available =
-            direction > 0
-              ? fn.xMax - task1State.a
-              : task1State.a - fn.xMin;
-        }
-
         startingDistance = Math.abs(delta);
 
         if (startingDistance < endingDistance * 3) {
-          startingDistance = Math.min(range * 0.22, available * 0.8);
+          startingDistance = range * 0.2;
         }
       } else {
         startingDistance = task1RawH();
 
         if (startingDistance < endingDistance * 3) {
-          startingDistance = Math.min(
-            range * 0.22,
-            Number(byId("t1H").max) ?
-              Math.pow(10, Number(byId("t1H").max)) :
-              range * 0.22
-          );
-
-          byId("t1H").value = Math.log10(startingDistance);
+          startingDistance =
+            Math.pow(10, Number(byId("t1H").max));
         }
       }
 
@@ -2841,7 +3772,8 @@
           task1State.b =
             task1State.a + direction * endingDistance;
         } else {
-          byId("t1H").value = Math.log10(endingDistance);
+          byId("t1H").value =
+            Math.log10(endingDistance);
         }
 
         renderTask1();
@@ -2853,30 +3785,37 @@
       };
 
       const frame = now => {
-        const progress = clamp((now - startTime) / duration, 0, 1);
+        const progress =
+          clamp((now - startTime) / duration, 0, 1);
 
         const distance =
           startingDistance *
-          Math.pow(endingDistance / startingDistance, progress);
+          Math.pow(
+            endingDistance / startingDistance,
+            progress
+          );
 
         if (task1State.mode === "free") {
           task1State.b =
             task1State.a + direction * distance;
         } else {
-          byId("t1H").value = Math.log10(distance);
+          byId("t1H").value =
+            Math.log10(distance);
         }
 
         renderTask1();
 
         if (progress < 1 && task1State.animation) {
-          task1State.animation.frame = requestAnimationFrame(frame);
+          task1State.animation.frame =
+            requestAnimationFrame(frame);
         } else {
           task1State.animation = null;
           renderTask1();
         }
       };
 
-      task1State.animation.frame = requestAnimationFrame(frame);
+      task1State.animation.frame =
+        requestAnimationFrame(frame);
     }
 
     byId("t1Function").addEventListener("change", event => {
@@ -2902,7 +3841,9 @@
     });
 
     byId("t1Mode").addEventListener("click", event => {
-      const button = event.target.closest("button[data-mode]");
+      const button =
+        event.target.closest("button[data-mode]");
+
       if (!button) return;
 
       stopTask1Animation();
@@ -2915,11 +3856,16 @@
           task1Function().defaultH
         );
 
-        const minimum = Math.pow(10, Number(byId("t1H").min));
-        const maximum = Math.pow(10, Number(byId("t1H").max));
+        const minimum =
+          Math.pow(10, Number(byId("t1H").min));
+
+        const maximum =
+          Math.pow(10, Number(byId("t1H").max));
 
         byId("t1H").value =
-          Math.log10(clamp(initialH, minimum, maximum));
+          Math.log10(
+            clamp(initialH, minimum, maximum)
+          );
 
         setTask1A(task1State.a);
       }
@@ -2928,7 +3874,9 @@
     });
 
     byId("t1ActivePoint").addEventListener("click", event => {
-      const button = event.target.closest("button[data-point]");
+      const button =
+        event.target.closest("button[data-point]");
+
       if (!button) return;
 
       task1State.activePoint = button.dataset.point;
@@ -2943,21 +3891,24 @@
           task1State.a +
           (task1State.b - task1State.a) / 2;
       } else {
-        const nextValue =
-          Number(byId("t1H").value) - Math.log10(2);
-
         byId("t1H").value = Math.max(
           Number(byId("t1H").min),
-          nextValue
+          Number(byId("t1H").value) - Math.log10(2)
         );
       }
 
       renderTask1();
     });
 
-    byId("t1Animate").addEventListener("click", startTask1Animation);
+    byId("t1Animate").addEventListener(
+      "click",
+      startTask1Animation
+    );
 
-    byId("t1Reset").addEventListener("click", resetTask1);
+    byId("t1Reset").addEventListener(
+      "click",
+      resetTask1
+    );
 
     byId("t1Plot").addEventListener("pointerdown", event => {
       if (event.button !== 0) return;
@@ -2965,7 +3916,8 @@
       event.preventDefault();
       stopTask1Animation();
 
-      const explicitHandle = event.target.dataset.handle;
+      const explicitHandle =
+        event.target.dataset.handle;
 
       let handle;
 
@@ -2992,12 +3944,19 @@
       } else if (handle === "q") {
         setTask1B(x);
       } else {
-        const distance = Math.abs(x - task1State.a);
-        const minimum = Math.pow(10, Number(byId("t1H").min));
-        const maximum = Math.pow(10, Number(byId("t1H").max));
+        const distance =
+          Math.abs(x - task1State.a);
+
+        const minimum =
+          Math.pow(10, Number(byId("t1H").min));
+
+        const maximum =
+          Math.pow(10, Number(byId("t1H").max));
 
         byId("t1H").value =
-          Math.log10(clamp(distance, minimum, maximum));
+          Math.log10(
+            clamp(distance, minimum, maximum)
+          );
       }
 
       renderTask1();
@@ -3021,12 +3980,19 @@
       } else if (handle === "q") {
         setTask1B(x);
       } else {
-        const distance = Math.abs(x - task1State.a);
-        const minimum = Math.pow(10, Number(byId("t1H").min));
-        const maximum = Math.pow(10, Number(byId("t1H").max));
+        const distance =
+          Math.abs(x - task1State.a);
+
+        const minimum =
+          Math.pow(10, Number(byId("t1H").min));
+
+        const maximum =
+          Math.pow(10, Number(byId("t1H").max));
 
         byId("t1H").value =
-          Math.log10(clamp(distance, minimum, maximum));
+          Math.log10(
+            clamp(distance, minimum, maximum)
+          );
       }
 
       renderTask1();
@@ -3051,8 +4017,11 @@
        TASK 2
     ============================================================ */
 
-    const task2MainPlot = new SVGPlot(byId("t2MainPlot"));
-    const task2DerivativePlot = new SVGPlot(byId("t2DerivativePlot"));
+    const task2MainPlot =
+      new SVGPlot(byId("t2MainPlot"));
+
+    const task2DerivativePlot =
+      new SVGPlot(byId("t2DerivativePlot"));
 
     const task2State = {
       functionId: "square",
@@ -3073,22 +4042,76 @@
       if (!Number.isFinite(y)) return;
 
       const key = x.toFixed(5);
+
       task2State.points.set(key, { x, y });
 
-      if (task2State.points.size > 650) {
-        const firstKey = task2State.points.keys().next().value;
+      if (task2State.points.size > 900) {
+        const firstKey =
+          task2State.points.keys().next().value;
+
         task2State.points.delete(firstKey);
+      }
+    }
+
+    function recordTask2Sweep(from, to) {
+      const fn = task2Function();
+      const range = fn.xMax - fn.xMin;
+
+      if (!Number.isFinite(from)) {
+        recordTask2Point(to);
+        return;
+      }
+
+      const spacing = range / 300;
+
+      const steps = Math.max(
+        1,
+        Math.ceil(Math.abs(to - from) / spacing)
+      );
+
+      for (let i = 0; i <= steps; i++) {
+        const x =
+          from + ((to - from) * i) / steps;
+
+        recordTask2Point(x);
+      }
+    }
+
+    function normaliseTask2Side() {
+      const fn = task2Function();
+      const range = fn.xMax - fn.xMin;
+      const tolerance = range * 1e-9;
+
+      if (
+        task2State.hSign > 0 &&
+        fn.xMax - task2State.a <= tolerance &&
+        task2State.a - fn.xMin > tolerance
+      ) {
+        task2State.hSign = -1;
+      }
+
+      if (
+        task2State.hSign < 0 &&
+        task2State.a - fn.xMin <= tolerance &&
+        fn.xMax - task2State.a > tolerance
+      ) {
+        task2State.hSign = 1;
       }
     }
 
     function setTask2A(value, collect = true) {
       const fn = task2Function();
+      const previous = task2State.a;
 
-      task2State.a = clamp(value, fn.xMin, fn.xMax);
+      task2State.a =
+        clamp(value, fn.xMin, fn.xMax);
+
+      normaliseTask2Side();
+
       byId("t2A").value = task2State.a;
 
       if (collect && byId("t2Collect").checked) {
-        recordTask2Point(task2State.a);
+        recordTask2Sweep(previous, task2State.a);
       }
     }
 
@@ -3120,13 +4143,17 @@
       byId("t2Collect").checked = true;
       byId("t2ShowAnswer").checked = false;
 
+      normaliseTask2Side();
       recordTask2Point(task2State.a);
+
       renderTask2();
     }
 
     function task2SignedH() {
       const fn = task2Function();
       const requested = logSliderValue(byId("t2H"));
+
+      normaliseTask2Side();
 
       const available =
         task2State.hSign < 0
@@ -3135,23 +4162,38 @@
 
       if (available <= 1e-12) return NaN;
 
-      return task2State.hSign *
-        Math.min(requested, available * 0.98);
+      return (
+        task2State.hSign *
+        Math.min(requested, available * 0.98)
+      );
     }
 
     function renderTask2() {
       const fn = task2Function();
+
+      normaliseTask2Side();
+
       const fa = fn.f(task2State.a);
       const exactDerivative = fn.df(task2State.a);
       const h = task2SignedH();
-      const finiteSlope = differenceQuotient(fn, task2State.a, h);
+
+      const finiteSlope =
+        differenceQuotient(fn, task2State.a, h);
 
       byId("t2A").value = task2State.a;
-      byId("t2AValue").textContent = formatNumber(task2State.a, 5);
-      byId("t2HValue").textContent =
-        Number.isFinite(h) ? formatNumber(h, 6) : "unavailable";
 
-      for (const button of byId("t2Side").querySelectorAll("button")) {
+      byId("t2AValue").textContent =
+        formatNumber(task2State.a, 5);
+
+      byId("t2HValue").textContent =
+        Number.isFinite(h)
+          ? formatNumber(Math.abs(h), 6)
+          : "unavailable";
+
+      for (
+        const button of
+        byId("t2Side").querySelectorAll("button")
+      ) {
         button.classList.toggle(
           "active",
           Number(button.dataset.sign) === task2State.hSign
@@ -3159,6 +4201,7 @@
       }
 
       /* Original function graph */
+
       task2MainPlot.setBounds(
         fn.xMin,
         fn.xMax,
@@ -3173,7 +4216,10 @@
         })
       ];
 
-      if (Number.isFinite(finiteSlope) && Number.isFinite(h)) {
+      if (
+        Number.isFinite(finiteSlope) &&
+        Number.isFinite(h)
+      ) {
         const qx = task2State.a + h;
         const qy = fn.f(qx);
 
@@ -3235,6 +4281,7 @@
       );
 
       /* Derivative graph */
+
       task2DerivativePlot.setBounds(
         fn.xMin,
         fn.xMax,
@@ -3243,28 +4290,68 @@
       );
 
       const derivativeLayers = [];
+      const derivativeRange = fn.dyMax - fn.dyMin;
+      const xRange = fn.xMax - fn.xMin;
 
       if (byId("t2ShowAnswer").checked) {
         derivativeLayers.push(
           task2DerivativePlot.curve(fn.df, {
             color: COLORS.tangent,
             width: 3,
-            opacity: 0.85
+            dash: "10 7",
+            opacity: 0.8
           })
         );
       }
 
-      const collectedPoints = [...task2State.points.values()]
-        .sort((a, b) => a.x - b.x);
+      if (Number.isFinite(exactDerivative)) {
+        derivativeLayers.push(
+          task2DerivativePlot.segment(
+            task2State.a,
+            fn.dyMin,
+            task2State.a,
+            exactDerivative,
+            {
+              color: COLORS.derivative,
+              width: 1.5,
+              dash: "5 5",
+              opacity: 0.42
+            }
+          )
+        );
+
+        derivativeLayers.push(
+          task2DerivativePlot.segment(
+            fn.xMin,
+            exactDerivative,
+            task2State.a,
+            exactDerivative,
+            {
+              color: COLORS.derivative,
+              width: 1.5,
+              dash: "5 5",
+              opacity: 0.42
+            }
+          )
+        );
+      }
+
+      const collectedPoints =
+        [...task2State.points.values()]
+          .sort((a, b) => a.x - b.x);
 
       derivativeLayers.push(
-        task2DerivativePlot.polyline(collectedPoints, {
-          color: COLORS.derivative,
-          width: 2.1,
-          opacity: 0.65,
-          maxDx: (fn.xMax - fn.xMin) / 35,
-          maxDy: (fn.dyMax - fn.dyMin) * 0.42
-        })
+        task2DerivativePlot.polyline(
+          collectedPoints,
+          {
+            color: COLORS.derivative,
+            width: 4.4,
+            opacity: 0.96,
+            maxDx: xRange / 8,
+            maxDy: derivativeRange * 0.4,
+            className: "collected-trace"
+          }
+        )
       );
 
       for (const point of collectedPoints) {
@@ -3274,7 +4361,11 @@
             point.y,
             {
               color: COLORS.derivative,
-              radius: 2.9
+              fillColor: COLORS.derivative,
+              strokeColor: COLORS.derivativeDark,
+              strokeWidth: 1.2,
+              radius: 3.4,
+              className: "collected-point"
             }
           )
         );
@@ -3286,9 +4377,13 @@
             task2State.a,
             exactDerivative,
             {
-              color: COLORS.tangent,
-              radius: 7,
-              label: "(a, f′(a))"
+              color: COLORS.derivative,
+              fillColor: COLORS.derivative,
+              strokeColor: "#ffffff",
+              strokeWidth: 3,
+              radius: 8.5,
+              label: "current slope",
+              className: "collected-point"
             }
           )
         );
@@ -3296,7 +4391,7 @@
 
       task2DerivativePlot.render(
         derivativeLayers,
-        `Collected points for the derivative of ${fn.formulaText}`
+        `Collected derivative points for ${fn.formulaText}`
       );
 
       const qValue =
@@ -3305,11 +4400,7 @@
           : NaN;
 
       byId("t2Formula").innerHTML = `
-        <div class="big-equation">
-          f′(a) =
-          lim<sub>h→0</sub>
-          [f(a+h)−f(a)]/h
-        </div>
+        ${firstPrincipleHTML("a")}
 
         <div class="equation">
           a = ${formatNumber(task2State.a, 7)},
@@ -3325,22 +4416,28 @@
         </div>
 
         ${
-          Number.isFinite(exactDerivative) && Number.isFinite(finiteSlope)
+          Number.isFinite(exactDerivative) &&
+          Number.isFinite(finiteSlope)
             ? `
               <div class="small-note">
                 Approximation error:
-                ${formatNumber(Math.abs(finiteSlope - exactDerivative), 8)}
+                ${formatNumber(
+                  Math.abs(finiteSlope - exactDerivative),
+                  8
+                )}
               </div>
             `
             : `
               <div class="small-note">
-                No ordinary two-sided tangent slope is defined at this point.
+                No ordinary two-sided tangent slope is defined
+                at this point.
               </div>
             `
         }
       `;
 
-      byId("t2DerivativeFormula").innerHTML = fn.derivativeHTML;
+      byId("t2DerivativeFormula").innerHTML =
+        fn.derivativeHTML;
 
       byId("t2Values").innerHTML = `
         <dl class="definition-list">
@@ -3358,8 +4455,12 @@
         </dl>
       `;
 
-      byId("t2Count").textContent =
-        `${task2State.points.size} derivative point(s) collected.`;
+      byId("t2Count").innerHTML = `
+        <strong style="color:var(--derivative)">
+          ${task2State.points.size}
+        </strong>
+        derivative point(s) collected.
+      `;
 
       const gauge = byId("t2Gauge");
       const needle = byId("t2Needle");
@@ -3370,15 +4471,11 @@
         const angle =
           -Math.atan(exactDerivative) * 180 / Math.PI;
 
-        needle.style.transform = `rotate(${angle}deg)`;
-        gauge.setAttribute(
-          "aria-label",
-          `Slope visualisation: ${formatNumber(exactDerivative)}`
-        );
+        needle.style.transform =
+          `rotate(${angle}deg)`;
       } else {
         gauge.classList.add("undefined");
         needle.style.transform = "rotate(0deg)";
-        gauge.setAttribute("aria-label", "The derivative is undefined");
       }
 
       byId("t2Trace").textContent =
@@ -3392,7 +4489,6 @@
 
       cancelAnimationFrame(task2State.animation.frame);
       task2State.animation = null;
-      byId("t2Trace").textContent = "Auto-trace derivative";
     }
 
     function startTask2Trace() {
@@ -3403,7 +4499,7 @@
       }
 
       const fn = task2Function();
-      const steps = 260;
+      const steps = 280;
 
       if (prefersReducedMotion) {
         for (let i = 0; i <= steps; i++) {
@@ -3429,8 +4525,11 @@
       };
 
       const frame = now => {
-        const progress = clamp((now - startTime) / duration, 0, 1);
-        const currentIndex = Math.floor(progress * steps);
+        const progress =
+          clamp((now - startTime) / duration, 0, 1);
+
+        const currentIndex =
+          Math.floor(progress * steps);
 
         for (
           let index = previousIndex + 1;
@@ -3447,20 +4546,23 @@
         previousIndex = currentIndex;
 
         const currentX =
-          fn.xMin + (fn.xMax - fn.xMin) * progress;
+          fn.xMin +
+          (fn.xMax - fn.xMin) * progress;
 
         setTask2A(currentX, false);
         renderTask2();
 
         if (progress < 1 && task2State.animation) {
-          task2State.animation.frame = requestAnimationFrame(frame);
+          task2State.animation.frame =
+            requestAnimationFrame(frame);
         } else {
           task2State.animation = null;
           renderTask2();
         }
       };
 
-      task2State.animation.frame = requestAnimationFrame(frame);
+      task2State.animation.frame =
+        requestAnimationFrame(frame);
     }
 
     function bindHorizontalPlotDrag(svg, plot, callback) {
@@ -3470,6 +4572,7 @@
         if (event.button !== 0) return;
 
         event.preventDefault();
+
         pointerId = event.pointerId;
         svg.setPointerCapture(pointerId);
 
@@ -3487,6 +4590,10 @@
         if (pointerId === event.pointerId) {
           pointerId = null;
         }
+      });
+
+      svg.addEventListener("pointercancel", () => {
+        pointerId = null;
       });
     }
 
@@ -3527,11 +4634,17 @@
     });
 
     byId("t2Side").addEventListener("click", event => {
-      const button = event.target.closest("button[data-sign]");
+      const button =
+        event.target.closest("button[data-sign]");
+
       if (!button) return;
 
       stopTask2Trace();
-      task2State.hSign = Number(button.dataset.sign);
+
+      task2State.hSign =
+        Number(button.dataset.sign);
+
+      normaliseTask2Side();
       renderTask2();
     });
 
@@ -3543,9 +4656,15 @@
       renderTask2();
     });
 
-    byId("t2ShowAnswer").addEventListener("change", renderTask2);
+    byId("t2ShowAnswer").addEventListener(
+      "change",
+      renderTask2
+    );
 
-    byId("t2Trace").addEventListener("click", startTask2Trace);
+    byId("t2Trace").addEventListener(
+      "click",
+      startTask2Trace
+    );
 
     byId("t2Clear").addEventListener("click", () => {
       stopTask2Trace();
@@ -3553,15 +4672,415 @@
       renderTask2();
     });
 
-    byId("t2Reset").addEventListener("click", resetTask2);
+    byId("t2Reset").addEventListener(
+      "click",
+      resetTask2
+    );
 
     /* ============================================================
-       TASK 3 — PIECEWISE FUNCTIONS
+       MATHEMATICAL EXPRESSION PARSER FOR TASK 3
+
+       No eval() or new Function() is used.
+    ============================================================ */
+
+    const MATH_FUNCTIONS = {
+      sin: Math.sin,
+      cos: Math.cos,
+      tan: Math.tan,
+      asin: Math.asin,
+      acos: Math.acos,
+      atan: Math.atan,
+      sinh: Math.sinh,
+      cosh: Math.cosh,
+      tanh: Math.tanh,
+      exp: Math.exp,
+      ln: Math.log,
+      log: Math.log,
+      sqrt: Math.sqrt,
+      abs: Math.abs,
+      sec: x => 1 / Math.cos(x),
+      csc: x => 1 / Math.sin(x),
+      cot: x => 1 / Math.tan(x)
+    };
+
+    const MATH_NAMES = [
+      ...Object.keys(MATH_FUNCTIONS),
+      "pi",
+      "x",
+      "e"
+    ].sort((a, b) => b.length - a.length);
+
+    function tokenizeMathExpression(source) {
+      let text = String(source)
+        .trim()
+        .toLowerCase()
+        .replace(/math\./g, "")
+        .replace(/[−–—]/g, "-")
+        .replace(/[×·]/g, "*")
+        .replace(/÷/g, "/")
+        .replace(/π/g, "pi")
+        .replace(/²/g, "^2")
+        .replace(/³/g, "^3")
+        .replace(/\*\*/g, "^");
+
+      if (!text) {
+        throw new Error("The function expression is empty.");
+      }
+
+      const rawTokens = [];
+      let index = 0;
+
+      while (index < text.length) {
+        const character = text[index];
+
+        if (/\s/.test(character)) {
+          index++;
+          continue;
+        }
+
+        const numberMatch =
+          text.slice(index).match(
+            /^(?:\d+(?:\.\d*)?|\.\d+)(?:e[+-]?\d+)?/i
+          );
+
+        if (numberMatch) {
+          rawTokens.push({
+            type: "number",
+            value: Number(numberMatch[0])
+          });
+
+          index += numberMatch[0].length;
+          continue;
+        }
+
+        if ("+-*/^".includes(character)) {
+          rawTokens.push({
+            type: "operator",
+            value: character
+          });
+
+          index++;
+          continue;
+        }
+
+        if (character === "(") {
+          rawTokens.push({
+            type: "lparen",
+            value: character
+          });
+
+          index++;
+          continue;
+        }
+
+        if (character === ")") {
+          rawTokens.push({
+            type: "rparen",
+            value: character
+          });
+
+          index++;
+          continue;
+        }
+
+        if (/[a-z]/.test(character)) {
+          const name =
+            MATH_NAMES.find(candidate =>
+              text.startsWith(candidate, index)
+            );
+
+          if (!name) {
+            throw new Error(
+              `Unknown name near "${text.slice(index, index + 8)}".`
+            );
+          }
+
+          if (name === "x") {
+            rawTokens.push({
+              type: "variable",
+              value: name
+            });
+          } else if (name === "pi" || name === "e") {
+            rawTokens.push({
+              type: "constant",
+              value: name
+            });
+          } else {
+            rawTokens.push({
+              type: "function",
+              value: name
+            });
+          }
+
+          index += name.length;
+          continue;
+        }
+
+        throw new Error(
+          `Unsupported character "${character}".`
+        );
+      }
+
+      const tokens = [];
+
+      const endsValue = token =>
+        token &&
+        (
+          token.type === "number" ||
+          token.type === "variable" ||
+          token.type === "constant" ||
+          token.type === "rparen"
+        );
+
+      const startsValue = token =>
+        token &&
+        (
+          token.type === "number" ||
+          token.type === "variable" ||
+          token.type === "constant" ||
+          token.type === "function" ||
+          token.type === "lparen"
+        );
+
+      for (const token of rawTokens) {
+        const previous = tokens[tokens.length - 1];
+
+        const functionCall =
+          previous &&
+          previous.type === "function" &&
+          token.type === "lparen";
+
+        if (
+          endsValue(previous) &&
+          startsValue(token) &&
+          !functionCall
+        ) {
+          tokens.push({
+            type: "operator",
+            value: "*"
+          });
+        }
+
+        tokens.push(token);
+      }
+
+      return tokens;
+    }
+
+    class ExpressionParser {
+      constructor(tokens) {
+        this.tokens = tokens;
+        this.index = 0;
+      }
+
+      current() {
+        return this.tokens[this.index];
+      }
+
+      consume() {
+        return this.tokens[this.index++];
+      }
+
+      matchOperator(operator) {
+        const token = this.current();
+
+        if (
+          token &&
+          token.type === "operator" &&
+          token.value === operator
+        ) {
+          this.index++;
+          return true;
+        }
+
+        return false;
+      }
+
+      expect(type) {
+        const token = this.current();
+
+        if (!token || token.type !== type) {
+          throw new Error(
+            type === "rparen"
+              ? "A closing parenthesis is missing."
+              : "The expression is incomplete."
+          );
+        }
+
+        this.index++;
+        return token;
+      }
+
+      parse() {
+        const evaluator = this.parseExpression();
+
+        if (this.index < this.tokens.length) {
+          throw new Error(
+            "Please check the operators and parentheses."
+          );
+        }
+
+        return evaluator;
+      }
+
+      parseExpression() {
+        let left = this.parseTerm();
+
+        while (true) {
+          if (this.matchOperator("+")) {
+            const right = this.parseTerm();
+            const previous = left;
+
+            left = x => previous(x) + right(x);
+          } else if (this.matchOperator("-")) {
+            const right = this.parseTerm();
+            const previous = left;
+
+            left = x => previous(x) - right(x);
+          } else {
+            break;
+          }
+        }
+
+        return left;
+      }
+
+      parseTerm() {
+        let left = this.parseUnary();
+
+        while (true) {
+          if (this.matchOperator("*")) {
+            const right = this.parseUnary();
+            const previous = left;
+
+            left = x => previous(x) * right(x);
+          } else if (this.matchOperator("/")) {
+            const right = this.parseUnary();
+            const previous = left;
+
+            left = x => previous(x) / right(x);
+          } else {
+            break;
+          }
+        }
+
+        return left;
+      }
+
+      parseUnary() {
+        if (this.matchOperator("+")) {
+          return this.parseUnary();
+        }
+
+        if (this.matchOperator("-")) {
+          const operand = this.parseUnary();
+          return x => -operand(x);
+        }
+
+        return this.parsePower();
+      }
+
+      parsePower() {
+        let left = this.parsePrimary();
+
+        if (this.matchOperator("^")) {
+          const right = this.parseUnary();
+          const previous = left;
+
+          left = x =>
+            Math.pow(previous(x), right(x));
+        }
+
+        return left;
+      }
+
+      parsePrimary() {
+        const token = this.current();
+
+        if (!token) {
+          throw new Error("The expression is incomplete.");
+        }
+
+        if (token.type === "number") {
+          this.consume();
+          return () => token.value;
+        }
+
+        if (token.type === "variable") {
+          this.consume();
+          return x => x;
+        }
+
+        if (token.type === "constant") {
+          this.consume();
+
+          const value =
+            token.value === "pi" ? Math.PI : Math.E;
+
+          return () => value;
+        }
+
+        if (token.type === "function") {
+          this.consume();
+
+          const functionName = token.value;
+          const mathFunction =
+            MATH_FUNCTIONS[functionName];
+
+          this.expect("lparen");
+
+          const argument =
+            this.parseExpression();
+
+          this.expect("rparen");
+
+          return x =>
+            mathFunction(argument(x));
+        }
+
+        if (token.type === "lparen") {
+          this.consume();
+
+          const inside =
+            this.parseExpression();
+
+          this.expect("rparen");
+
+          return inside;
+        }
+
+        throw new Error(
+          "A number, x, function or parenthesis was expected."
+        );
+      }
+    }
+
+    function compileMathExpression(source) {
+      const tokens =
+        tokenizeMathExpression(source);
+
+      const parser =
+        new ExpressionParser(tokens);
+
+      const evaluator = parser.parse();
+
+      return x => {
+        try {
+          return Number(evaluator(Number(x)));
+        } catch {
+          return NaN;
+        }
+      };
+    }
+
+    /* ============================================================
+       TASK 3
     ============================================================ */
 
     const PIECEWISE_PRESETS = {
       smooth: {
         id: "smooth",
+        numeric: false,
         c: 1,
         xMin: -3,
         xMax: 5,
@@ -3573,11 +5092,13 @@
         dRight: () => 2,
         leftHTML: "x<sup>2</sup>, &nbsp; x ≤ 1",
         rightHTML: "2x − 1, &nbsp; x &gt; 1",
-        description: "The two branches meet with the same slope."
+        description:
+          "The two branches meet with the same slope."
       },
 
       corner: {
         id: "corner",
+        numeric: false,
         c: 0,
         xMin: -4,
         xMax: 4,
@@ -3589,11 +5110,13 @@
         dRight: () => 1,
         leftHTML: "−x, &nbsp; x ≤ 0",
         rightHTML: "x, &nbsp; x &gt; 0",
-        description: "The function is continuous, but the slopes disagree."
+        description:
+          "The function is continuous, but the slopes disagree."
       },
 
       jump: {
         id: "jump",
+        numeric: false,
         c: 0,
         xMin: -3,
         xMax: 3,
@@ -3605,7 +5128,8 @@
         dRight: () => 1,
         leftHTML: "x<sup>2</sup> + 1, &nbsp; x ≤ 0",
         rightHTML: "x, &nbsp; x &gt; 0",
-        description: "A jump discontinuity prevents differentiability."
+        description:
+          "A jump discontinuity prevents differentiability."
       }
     };
 
@@ -3615,73 +5139,485 @@
       pieceId: "smooth",
       mLeft: -1,
       mRight: 2,
+      functionPiece: null,
       animation: null
     };
 
+    function convergenceEstimate(values) {
+      if (
+        values.length < 4 ||
+        values.some(value => !Number.isFinite(value))
+      ) {
+        return {
+          exists: false,
+          value: NaN
+        };
+      }
+
+      const [v1, v2, v3, v4] = values;
+
+      const d1 = Math.abs(v2 - v1);
+      const d2 = Math.abs(v3 - v2);
+      const d3 = Math.abs(v4 - v3);
+
+      const scale =
+        1 + Math.max(...values.map(Math.abs));
+
+      const stable =
+        d3 <= d2 * 0.85 + scale * 1e-7 &&
+        d2 <= d1 * 0.95 + scale * 1e-7;
+
+      const estimate = 2 * v4 - v3;
+
+      return {
+        exists:
+          stable &&
+          Number.isFinite(estimate) &&
+          Math.abs(estimate) < 1e12,
+
+        value: estimate
+      };
+    }
+
+    function estimateSideLimit(fn, c, direction, domainScale) {
+      const baseH = Math.max(
+        domainScale * 1e-3,
+        1e-4 * (1 + Math.abs(c))
+      );
+
+      const values = [1, 2, 4, 8].map(divisor =>
+        safeEvaluate(
+          fn,
+          c + direction * baseH / divisor
+        )
+      );
+
+      return convergenceEstimate(values);
+    }
+
+    function estimateSideDerivative(
+      fn,
+      c,
+      direction,
+      fC,
+      domainScale
+    ) {
+      if (!Number.isFinite(fC)) {
+        return {
+          exists: false,
+          value: NaN
+        };
+      }
+
+      const baseH = Math.max(
+        domainScale * 1e-3,
+        1e-4 * (1 + Math.abs(c))
+      );
+
+      const values = [1, 2, 4, 8].map(divisor => {
+        const h = baseH / divisor;
+        const x = c + direction * h;
+        const fx = safeEvaluate(fn, x);
+
+        return (
+          Number.isFinite(fx)
+            ? (fx - fC) / (direction * h)
+            : NaN
+        );
+      });
+
+      return convergenceEstimate(values);
+    }
+
+    function percentile(sortedValues, proportion) {
+      if (!sortedValues.length) return NaN;
+
+      const index =
+        (sortedValues.length - 1) * proportion;
+
+      const lower = Math.floor(index);
+      const upper = Math.ceil(index);
+
+      if (lower === upper) {
+        return sortedValues[lower];
+      }
+
+      const weight = index - lower;
+
+      return (
+        sortedValues[lower] * (1 - weight) +
+        sortedValues[upper] * weight
+      );
+    }
+
+    function estimatePiecewiseYBounds(
+      left,
+      right,
+      c,
+      xMin,
+      xMax
+    ) {
+      const values = [];
+
+      for (let i = 0; i <= 700; i++) {
+        const x =
+          xMin + ((xMax - xMin) * i) / 700;
+
+        const fn = x <= c ? left : right;
+        const y = safeEvaluate(fn, x);
+
+        if (
+          Number.isFinite(y) &&
+          Math.abs(y) < 1e9
+        ) {
+          values.push(y);
+        }
+      }
+
+      if (values.length < 5) {
+        return {
+          yMin: -5,
+          yMax: 5
+        };
+      }
+
+      values.sort((a, b) => a - b);
+
+      let low = percentile(values, 0.02);
+      let high = percentile(values, 0.98);
+
+      const fC = safeEvaluate(left, c);
+
+      if (Number.isFinite(fC)) {
+        low = Math.min(low, fC);
+        high = Math.max(high, fC);
+      }
+
+      let span = high - low;
+
+      if (!Number.isFinite(span) || span < 1e-6) {
+        span = Math.max(2, Math.abs(low) * 0.5);
+        low -= span;
+        high += span;
+      }
+
+      const padding = span * 0.16;
+
+      let yMin = low - padding;
+      let yMax = high + padding;
+
+      if (yMin > 0) yMin = Math.min(0, yMin);
+      if (yMax < 0) yMax = Math.max(0, yMax);
+
+      if (yMax - yMin < 2) {
+        const centre = (yMin + yMax) / 2;
+        yMin = centre - 1;
+        yMax = centre + 1;
+      }
+
+      return { yMin, yMax };
+    }
+
     function linearFormula(coefficient) {
-      if (approximatelyEqual(coefficient, 0)) return "0";
-      if (approximatelyEqual(coefficient, 1)) return "x";
-      if (approximatelyEqual(coefficient, -1)) return "−x";
+      if (approximatelyEqual(coefficient, 0)) {
+        return "0";
+      }
+
+      if (approximatelyEqual(coefficient, 1)) {
+        return "x";
+      }
+
+      if (approximatelyEqual(coefficient, -1)) {
+        return "−x";
+      }
 
       return `${formatNumber(coefficient, 2)}x`;
     }
 
-    function task3Piece() {
-      if (task3State.pieceId !== "custom") {
-        return PIECEWISE_PRESETS[task3State.pieceId];
-      }
-
+    function buildLinePiece() {
       return {
-        id: "custom",
+        id: "lines",
+        numeric: false,
         c: 0,
         xMin: -4,
         xMax: 4,
         yMin: -18,
         yMax: 18,
+
         left: x => task3State.mLeft * x,
         right: x => task3State.mRight * x,
+
         dLeft: () => task3State.mLeft,
         dRight: () => task3State.mRight,
+
         leftHTML:
           `${linearFormula(task3State.mLeft)}, &nbsp; x ≤ 0`,
+
         rightHTML:
           `${linearFormula(task3State.mRight)}, &nbsp; x &gt; 0`,
+
         description:
           "Adjust the two slopes until the one-sided derivatives agree."
       };
     }
 
+    function task3Piece() {
+      if (task3State.pieceId === "lines") {
+        return buildLinePiece();
+      }
+
+      if (task3State.pieceId === "functions") {
+        return (
+          task3State.functionPiece ||
+          PIECEWISE_PRESETS.smooth
+        );
+      }
+
+      return PIECEWISE_PRESETS[task3State.pieceId];
+    }
+
+    function applyTask3Functions({
+      announce = true,
+      render = true
+    } = {}) {
+      try {
+        const leftSource =
+          byId("t3LeftExpression").value.trim();
+
+        const rightSource =
+          byId("t3RightExpression").value.trim();
+
+        const c = Number(byId("t3Join").value);
+        const halfWidth =
+          Number(byId("t3Window").value);
+
+        if (!Number.isFinite(c)) {
+          throw new Error(
+            "The joining point c must be a real number."
+          );
+        }
+
+        if (
+          !Number.isFinite(halfWidth) ||
+          halfWidth <= 0
+        ) {
+          throw new Error(
+            "The viewing half-width must be positive."
+          );
+        }
+
+        const left =
+          compileMathExpression(leftSource);
+
+        const right =
+          compileMathExpression(rightSource);
+
+        const xMin = c - halfWidth;
+        const xMax = c + halfWidth;
+
+        let finiteSamples = 0;
+
+        for (let i = 0; i <= 40; i++) {
+          const x =
+            xMin + ((xMax - xMin) * i) / 40;
+
+          const fn = x <= c ? left : right;
+          const y = safeEvaluate(fn, x);
+
+          if (Number.isFinite(y)) {
+            finiteSamples++;
+          }
+        }
+
+        if (finiteSamples < 5) {
+          throw new Error(
+            "The entered functions are not defined on enough of the selected viewing interval."
+          );
+        }
+
+        const bounds =
+          estimatePiecewiseYBounds(
+            left,
+            right,
+            c,
+            xMin,
+            xMax
+          );
+
+        task3State.functionPiece = {
+          id: "functions",
+          numeric: true,
+          c,
+          xMin,
+          xMax,
+          yMin: bounds.yMin,
+          yMax: bounds.yMax,
+          left,
+          right,
+
+          leftHTML:
+            `${escapeHTML(leftSource)}, &nbsp; ` +
+            `x ≤ ${formatNumber(c, 5)}`,
+
+          rightHTML:
+            `${escapeHTML(rightSource)}, &nbsp; ` +
+            `x &gt; ${formatNumber(c, 5)}`,
+
+          description:
+            "The one-sided limits and derivatives are estimated numerically."
+        };
+
+        if (announce) {
+          setStatus(
+            byId("t3FunctionStatus"),
+            "good",
+            "Functions applied",
+            `
+              The joining point is
+              c = ${formatNumber(c, 6)}.
+              Move h towards zero to investigate the two sides.
+            `
+          );
+        }
+
+        if (render) {
+          configureTask3H();
+          renderTask3();
+        }
+
+        return true;
+      } catch (error) {
+        if (announce) {
+          setStatus(
+            byId("t3FunctionStatus"),
+            "warn",
+            "The functions could not be applied",
+            escapeHTML(error.message)
+          );
+        }
+
+        return false;
+      }
+    }
+
     function task3Statistics(piece) {
       const c = piece.c;
-      const fC = piece.left(c);
-      const leftLimit = piece.left(c);
-      const rightLimit = piece.right(c);
+      const fC = safeEvaluate(piece.left, c);
+      const domainScale = piece.xMax - piece.xMin;
+
+      let leftLimitInfo;
+      let rightLimitInfo;
+      let leftDerivativeInfo;
+      let rightDerivativeInfo;
+
+      if (piece.numeric) {
+        leftLimitInfo =
+          estimateSideLimit(
+            piece.left,
+            c,
+            -1,
+            domainScale
+          );
+
+        rightLimitInfo =
+          estimateSideLimit(
+            piece.right,
+            c,
+            1,
+            domainScale
+          );
+
+        leftDerivativeInfo =
+          estimateSideDerivative(
+            piece.left,
+            c,
+            -1,
+            fC,
+            domainScale
+          );
+
+        rightDerivativeInfo =
+          estimateSideDerivative(
+            piece.right,
+            c,
+            1,
+            fC,
+            domainScale
+          );
+      } else {
+        const leftLimit =
+          safeEvaluate(piece.left, c);
+
+        const rightLimit =
+          safeEvaluate(piece.right, c);
+
+        const leftDerivative =
+          safeEvaluate(piece.dLeft, c);
+
+        const rightDerivative =
+          safeEvaluate(piece.dRight, c);
+
+        leftLimitInfo = {
+          exists: Number.isFinite(leftLimit),
+          value: leftLimit
+        };
+
+        rightLimitInfo = {
+          exists: Number.isFinite(rightLimit),
+          value: rightLimit
+        };
+
+        leftDerivativeInfo = {
+          exists: Number.isFinite(leftDerivative),
+          value: leftDerivative
+        };
+
+        rightDerivativeInfo = {
+          exists: Number.isFinite(rightDerivative),
+          value: rightDerivative
+        };
+      }
+
+      const continuityTolerance =
+        piece.numeric ? 8e-4 : 1e-9;
 
       const continuous =
-        approximatelyEqual(leftLimit, rightLimit, 1e-9) &&
-        approximatelyEqual(fC, leftLimit, 1e-9);
+        Number.isFinite(fC) &&
+        leftLimitInfo.exists &&
+        rightLimitInfo.exists &&
+        approximatelyEqual(
+          leftLimitInfo.value,
+          fC,
+          continuityTolerance
+        ) &&
+        approximatelyEqual(
+          rightLimitInfo.value,
+          fC,
+          continuityTolerance
+        );
 
-      const leftDerivative = piece.dLeft(c);
-
-      const rightDerivative =
-        continuous
-          ? piece.dRight(c)
-          : NaN;
+      const derivativeTolerance =
+        piece.numeric ? 4e-3 : 1e-8;
 
       const derivativeExists =
         continuous &&
-        Number.isFinite(leftDerivative) &&
-        Number.isFinite(rightDerivative) &&
-        approximatelyEqual(leftDerivative, rightDerivative, 1e-8);
+        leftDerivativeInfo.exists &&
+        rightDerivativeInfo.exists &&
+        approximatelyEqual(
+          leftDerivativeInfo.value,
+          rightDerivativeInfo.value,
+          derivativeTolerance
+        );
 
       return {
         c,
         fC,
-        leftLimit,
-        rightLimit,
+        numeric: piece.numeric,
+        leftLimitInfo,
+        rightLimitInfo,
+        leftDerivativeInfo,
+        rightDerivativeInfo,
         continuous,
-        leftDerivative,
-        rightDerivative,
         derivativeExists
       };
     }
@@ -3695,22 +5631,27 @@
         piece.xMax - piece.c
       );
 
-      return Math.min(requested, available * 0.98);
+      return Math.min(
+        requested,
+        available * 0.98
+      );
     }
 
     function configureTask3H() {
       const piece = task3Piece();
       const range = piece.xMax - piece.xMin;
-      const maximum = Math.min(
-        piece.c - piece.xMin,
-        piece.xMax - piece.c
-      ) * 0.8;
+
+      const maximum =
+        Math.min(
+          piece.c - piece.xMin,
+          piece.xMax - piece.c
+        ) * 0.8;
 
       configureLogSlider(
         byId("t3H"),
         range / 10000,
-        maximum,
-        range * 0.12
+        Math.max(maximum, range / 100),
+        Math.max(range * 0.12, range / 1000)
       );
     }
 
@@ -3723,6 +5664,18 @@
       byId("t3ML").value = task3State.mLeft;
       byId("t3MR").value = task3State.mRight;
 
+      if (task3State.pieceId === "functions") {
+        byId("t3LeftExpression").value = "x^2";
+        byId("t3RightExpression").value = "2*x-1";
+        byId("t3Join").value = "1";
+        byId("t3Window").value = "4";
+
+        applyTask3Functions({
+          announce: false,
+          render: false
+        });
+      }
+
       configureTask3H();
       renderTask3();
     }
@@ -3731,14 +5684,18 @@
       return `
         <div class="piecewise-formula">
           <span>f(x) =</span>
+
           <span class="brace">{</span>
+
           <span class="piecewise-cases">
             <span>${piece.leftHTML}</span>
             <span>${piece.rightHTML}</span>
           </span>
         </div>
 
-        <p class="small-note">${piece.description}</p>
+        <p class="small-note">
+          ${piece.description}
+        </p>
       `;
     }
 
@@ -3758,53 +5715,106 @@
         base / 125
       ];
 
-      const rows = magnitudes.map(r => {
-        const leftQuotient =
-          (piece.left(piece.c - r) - statistics.fC) / (-r);
+      byId("t3TableBody").innerHTML =
+        magnitudes.map(r => {
+          const leftValue =
+            safeEvaluate(piece.left, piece.c - r);
 
-        const rightQuotient =
-          (piece.right(piece.c + r) - statistics.fC) / r;
+          const rightValue =
+            safeEvaluate(piece.right, piece.c + r);
 
-        return `
-          <tr>
-            <td>${formatNumber(r, 7)}</td>
-            <td>${formatNumber(leftQuotient, 8)}</td>
-            <td>${formatNumber(rightQuotient, 8)}</td>
-          </tr>
-        `;
-      });
+          const leftQuotient =
+            (leftValue - statistics.fC) / (-r);
 
-      byId("t3TableBody").innerHTML = rows.join("");
+          const rightQuotient =
+            (rightValue - statistics.fC) / r;
+
+          return `
+            <tr>
+              <td>${formatNumber(r, 7)}</td>
+              <td>${formatNumber(leftQuotient, 8)}</td>
+              <td>${formatNumber(rightQuotient, 8)}</td>
+            </tr>
+          `;
+        }).join("");
+    }
+
+    function formatEstimate(info, numeric) {
+      if (!info.exists) {
+        return "does not exist";
+      }
+
+      return (
+        `${numeric ? "≈ " : ""}` +
+        formatNumber(info.value, 7)
+      );
     }
 
     function renderTask3Status(statistics) {
+      const leftLimit =
+        formatEstimate(
+          statistics.leftLimitInfo,
+          statistics.numeric
+        );
+
+      const rightLimit =
+        formatEstimate(
+          statistics.rightLimitInfo,
+          statistics.numeric
+        );
+
+      const leftDerivative =
+        formatEstimate(
+          statistics.leftDerivativeInfo,
+          statistics.numeric
+        );
+
+      const rightDerivative =
+        formatEstimate(
+          statistics.rightDerivativeInfo,
+          statistics.numeric
+        );
+
       if (statistics.derivativeExists) {
+        const derivativeValue =
+          (
+            statistics.leftDerivativeInfo.value +
+            statistics.rightDerivativeInfo.value
+          ) / 2;
+
         setStatus(
           byId("t3Status"),
           "good",
           "The derivative exists",
           `
             <div>
-              Continuity:
-              lim<sub>x→c−</sub>f(x) =
-              lim<sub>x→c+</sub>f(x) =
-              f(c) =
-              ${formatNumber(statistics.fC, 7)}.
+              The function is continuous at
+              c = ${formatNumber(statistics.c, 5)}.
             </div>
 
             <div style="margin-top:7px">
-              f′<sub>−</sub>(c) =
-              ${formatNumber(statistics.leftDerivative, 7)}
+              f′<sub>−</sub>(c) ${statistics.numeric ? "≈" : "="}
+              ${formatNumber(
+                statistics.leftDerivativeInfo.value,
+                7
+              )}
+
               and
-              f′<sub>+</sub>(c) =
-              ${formatNumber(statistics.rightDerivative, 7)}.
+
+              f′<sub>+</sub>(c) ${statistics.numeric ? "≈" : "="}
+              ${formatNumber(
+                statistics.rightDerivativeInfo.value,
+                7
+              )}.
             </div>
 
             <div style="margin-top:7px">
               Therefore,
+
               <strong>
-                f′(${formatNumber(statistics.c, 5)}) =
-                ${formatNumber(statistics.leftDerivative, 7)}
+                f′(${formatNumber(statistics.c, 5)})
+                ${statistics.numeric ? "≈" : "="}
+                ${formatNumber(derivativeValue, 7)}
               </strong>.
             </div>
           `
@@ -3819,12 +5829,9 @@
           "warn",
           "The function is not continuous",
           `
-            Left limit =
-            ${formatNumber(statistics.leftLimit, 7)},
-            right limit =
-            ${formatNumber(statistics.rightLimit, 7)}, and
-            f(c) =
-            ${formatNumber(statistics.fC, 7)}.
+            Left limit: ${leftLimit}<br>
+            Right limit: ${rightLimit}<br>
+            f(c) = ${formatNumber(statistics.fC, 7)}
 
             <div style="margin-top:7px">
               Since differentiability implies continuity,
@@ -3844,11 +5851,13 @@
           The function is continuous at c, but
 
           <div style="margin-top:7px">
-            f′<sub>−</sub>(c) =
-            ${formatNumber(statistics.leftDerivative, 7)}
+            f′<sub>−</sub>(c) ${statistics.numeric ? "≈" : "="}
+            ${leftDerivative},
+
             while
-            f′<sub>+</sub>(c) =
-            ${formatNumber(statistics.rightDerivative, 7)}.
+
+            f′<sub>+</sub>(c) ${statistics.numeric ? "≈" : "="}
+            ${rightDerivative}.
           </div>
 
           <div style="margin-top:7px">
@@ -3863,8 +5872,11 @@
       const statistics = task3Statistics(piece);
       const h = task3H();
 
-      byId("t3CustomPanel").hidden =
-        task3State.pieceId !== "custom";
+      byId("t3LinePanel").hidden =
+        task3State.pieceId !== "lines";
+
+      byId("t3FunctionPanel").hidden =
+        task3State.pieceId !== "functions";
 
       byId("t3MLValue").textContent =
         formatNumber(task3State.mLeft, 2);
@@ -3890,8 +5902,11 @@
       const qLeftX = piece.c - h;
       const qRightX = piece.c + h;
 
-      const qLeftY = piece.left(qLeftX);
-      const qRightY = piece.right(qRightX);
+      const qLeftY =
+        safeEvaluate(piece.left, qLeftX);
+
+      const qRightY =
+        safeEvaluate(piece.right, qRightX);
 
       const leftQuotient =
         (qLeftY - statistics.fC) / (-h);
@@ -3902,23 +5917,29 @@
       const layers = [];
 
       if (statistics.derivativeExists) {
+        const derivativeValue =
+          (
+            statistics.leftDerivativeInfo.value +
+            statistics.rightDerivativeInfo.value
+          ) / 2;
+
         layers.push(
           task3Plot.lineThrough(
             piece.c,
             statistics.fC,
-            statistics.leftDerivative,
+            derivativeValue,
             {
               color: COLORS.tangent,
               width: 3,
-              opacity: 0.65
+              opacity: 0.66
             }
           )
         );
-      } else {
-        if (Number.isFinite(statistics.leftDerivative)) {
+      } else if (statistics.continuous) {
+        if (statistics.leftDerivativeInfo.exists) {
           const leftEndY =
             statistics.fC +
-            statistics.leftDerivative *
+            statistics.leftDerivativeInfo.value *
             (piece.xMin - piece.c);
 
           layers.push(
@@ -3936,10 +5957,10 @@
           );
         }
 
-        if (Number.isFinite(statistics.rightDerivative)) {
+        if (statistics.rightDerivativeInfo.exists) {
           const rightEndY =
             statistics.fC +
-            statistics.rightDerivative *
+            statistics.rightDerivativeInfo.value *
             (piece.xMax - piece.c);
 
           layers.push(
@@ -4026,11 +6047,21 @@
         )
       );
 
-      if (!statistics.continuous) {
+      if (
+        statistics.rightLimitInfo.exists &&
+        (
+          !Number.isFinite(statistics.fC) ||
+          !approximatelyEqual(
+            statistics.rightLimitInfo.value,
+            statistics.fC,
+            1e-5
+          )
+        )
+      ) {
         layers.push(
           task3Plot.point(
             piece.c,
-            statistics.rightLimit,
+            statistics.rightLimitInfo.value,
             {
               color: COLORS.right,
               radius: 7,
@@ -4041,17 +6072,19 @@
         );
       }
 
-      layers.push(
-        task3Plot.point(
-          piece.c,
-          statistics.fC,
-          {
-            color: COLORS.dark,
-            radius: 7,
-            label: "P"
-          }
-        )
-      );
+      if (Number.isFinite(statistics.fC)) {
+        layers.push(
+          task3Plot.point(
+            piece.c,
+            statistics.fC,
+            {
+              color: COLORS.dark,
+              radius: 7,
+              label: "P"
+            }
+          )
+        );
+      }
 
       task3Plot.render(
         layers,
@@ -4086,7 +6119,6 @@
 
       cancelAnimationFrame(task3State.animation.frame);
       task3State.animation = null;
-      byId("t3Animate").textContent = "Animate h → 0";
     }
 
     function startTask3Animation() {
@@ -4105,11 +6137,14 @@
         startingH =
           Math.pow(10, Number(byId("t3H").max));
 
-        byId("t3H").value = Math.log10(startingH);
+        byId("t3H").value =
+          Math.log10(startingH);
       }
 
       if (prefersReducedMotion) {
-        byId("t3H").value = Math.log10(minimumH);
+        byId("t3H").value =
+          Math.log10(minimumH);
+
         renderTask3();
         return;
       }
@@ -4122,29 +6157,48 @@
       };
 
       const frame = now => {
-        const progress = clamp((now - startTime) / duration, 0, 1);
+        const progress =
+          clamp((now - startTime) / duration, 0, 1);
 
         const h =
           startingH *
-          Math.pow(minimumH / startingH, progress);
+          Math.pow(
+            minimumH / startingH,
+            progress
+          );
 
         byId("t3H").value = Math.log10(h);
+
         renderTask3();
 
         if (progress < 1 && task3State.animation) {
-          task3State.animation.frame = requestAnimationFrame(frame);
+          task3State.animation.frame =
+            requestAnimationFrame(frame);
         } else {
           task3State.animation = null;
           renderTask3();
         }
       };
 
-      task3State.animation.frame = requestAnimationFrame(frame);
+      task3State.animation.frame =
+        requestAnimationFrame(frame);
     }
 
     byId("t3Piece").addEventListener("change", event => {
       stopTask3Animation();
+
       task3State.pieceId = event.target.value;
+
+      if (
+        task3State.pieceId === "functions" &&
+        !task3State.functionPiece
+      ) {
+        applyTask3Functions({
+          announce: false,
+          render: false
+        });
+      }
+
       configureTask3H();
       renderTask3();
     });
@@ -4156,13 +6210,19 @@
 
     byId("t3ML").addEventListener("input", event => {
       stopTask3Animation();
-      task3State.mLeft = Number(event.target.value);
+
+      task3State.mLeft =
+        Number(event.target.value);
+
       renderTask3();
     });
 
     byId("t3MR").addEventListener("input", event => {
       stopTask3Animation();
-      task3State.mRight = Number(event.target.value);
+
+      task3State.mRight =
+        Number(event.target.value);
+
       renderTask3();
     });
 
@@ -4175,23 +6235,59 @@
       renderTask3();
     });
 
+    byId("t3ApplyFunctions").addEventListener(
+      "click",
+      () => applyTask3Functions()
+    );
+
+    byId("t3FunctionPanel").addEventListener(
+      "keydown",
+      event => {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          applyTask3Functions();
+        }
+      }
+    );
+
+    for (
+      const button of
+      document.querySelectorAll(".example-button")
+    ) {
+      button.addEventListener("click", () => {
+        byId("t3LeftExpression").value =
+          button.dataset.left;
+
+        byId("t3RightExpression").value =
+          button.dataset.right;
+
+        byId("t3Join").value =
+          button.dataset.c;
+
+        applyTask3Functions();
+      });
+    }
+
     byId("t3Closer").addEventListener("click", () => {
       stopTask3Animation();
 
-      const next =
-        Number(byId("t3H").value) - Math.log10(2);
-
       byId("t3H").value = Math.max(
         Number(byId("t3H").min),
-        next
+        Number(byId("t3H").value) - Math.log10(2)
       );
 
       renderTask3();
     });
 
-    byId("t3Animate").addEventListener("click", startTask3Animation);
+    byId("t3Animate").addEventListener(
+      "click",
+      startTask3Animation
+    );
 
-    byId("t3Reset").addEventListener("click", resetTask3);
+    byId("t3Reset").addEventListener(
+      "click",
+      resetTask3
+    );
 
     bindHorizontalPlotDrag(
       byId("t3Plot"),
@@ -4209,10 +6305,682 @@
           Math.pow(10, Number(byId("t3H").max));
 
         byId("t3H").value =
-          Math.log10(clamp(distance, minimum, maximum));
+          Math.log10(
+            clamp(distance, minimum, maximum)
+          );
 
         renderTask3();
       }
+    );
+
+    /* ============================================================
+       TASK 4 — MULTIPLE-CHOICE TEST
+    ============================================================ */
+
+    const QUIZ_BANK = [
+      {
+        topic: "First principle",
+        question:
+          "Which expression gives the derivative of f at x=a by the first principle?",
+        options: [
+          {
+            text:
+              "lim<sub>h→0</sub> [f(a+h)−f(a)]/h",
+            correct: true
+          },
+          {
+            text:
+              "lim<sub>h→∞</sub> [f(a+h)+f(a)]/h",
+            correct: false
+          },
+          {
+            text:
+              "[f(a)+f(h)]/(a+h)",
+            correct: false
+          },
+          {
+            text:
+              "lim<sub>h→0</sub> [f(a+h)−f(h)]/a",
+            correct: false
+          }
+        ],
+        explanation:
+          "The derivative is the limit of the difference quotient [f(a+h)−f(a)]/h as h approaches zero."
+      },
+      {
+        topic: "Secant and tangent",
+        question:
+          "For two distinct points P(a,f(a)) and Q(b,f(b)), what is the slope of the secant line PQ?",
+        options: [
+          {
+            text: "[f(b)−f(a)]/(b−a)",
+            correct: true
+          },
+          {
+            text: "[f(b)+f(a)]/(b+a)",
+            correct: false
+          },
+          {
+            text: "(b−a)/[f(b)−f(a)]",
+            correct: false
+          },
+          {
+            text: "f(b)−f(a)",
+            correct: false
+          }
+        ],
+        explanation:
+          "The secant slope is the change in y divided by the corresponding change in x."
+      },
+      {
+        topic: "Basic derivatives",
+        question:
+          "If f(x)=x², what is f′(2)?",
+        options: [
+          {
+            text: "2",
+            correct: false
+          },
+          {
+            text: "4",
+            correct: true
+          },
+          {
+            text: "6",
+            correct: false
+          },
+          {
+            text: "8",
+            correct: false
+          }
+        ],
+        explanation:
+          "Since f′(x)=2x, we have f′(2)=2(2)=4."
+      },
+      {
+        topic: "One-sided derivatives",
+        question:
+          "Why is f(x)=|x| not differentiable at x=0?",
+        options: [
+          {
+            text:
+              "The function is not defined at x=0.",
+            correct: false
+          },
+          {
+            text:
+              "The left derivative is −1 and the right derivative is 1.",
+            correct: true
+          },
+          {
+            text:
+              "Both one-sided derivatives are zero.",
+            correct: false
+          },
+          {
+            text:
+              "The function is not continuous at x=0.",
+            correct: false
+          }
+        ],
+        explanation:
+          "The function is continuous, but the left-hand and right-hand derivatives are different."
+      },
+      {
+        topic: "Continuity",
+        question:
+          "Which statement is always true?",
+        options: [
+          {
+            text:
+              "If f is continuous at a, then f is differentiable at a.",
+            correct: false
+          },
+          {
+            text:
+              "If f is differentiable at a, then f is continuous at a.",
+            correct: true
+          },
+          {
+            text:
+              "Every discontinuous function has derivative zero.",
+            correct: false
+          },
+          {
+            text:
+              "Continuity and differentiability are equivalent.",
+            correct: false
+          }
+        ],
+        explanation:
+          "Differentiability implies continuity. The converse is false; for example, |x| is continuous but not differentiable at zero."
+      },
+      {
+        topic: "Basic derivatives",
+        question:
+          "What is the derivative of tan x?",
+        options: [
+          {
+            text: "cos x",
+            correct: false
+          },
+          {
+            text: "−sin x",
+            correct: false
+          },
+          {
+            text: "sec²x",
+            correct: true
+          },
+          {
+            text: "csc²x",
+            correct: false
+          }
+        ],
+        explanation:
+          "The standard differentiation formula is d(tan x)/dx = sec²x."
+      },
+      {
+        topic: "Piecewise functions",
+        question:
+          "Let f(x)=4cos x+1 for x≤0 and f(x)=ax+b for x&gt;0. If f is differentiable everywhere, what are a and b?",
+        options: [
+          {
+            text: "a=4, b=1",
+            correct: false
+          },
+          {
+            text: "a=0, b=5",
+            correct: true
+          },
+          {
+            text: "a=5, b=0",
+            correct: false
+          },
+          {
+            text: "a=−4, b=5",
+            correct: false
+          }
+        ],
+        explanation:
+          "Continuity at zero gives b=5. The left derivative is −4sin(0)=0, so matching derivatives gives a=0."
+      },
+      {
+        topic: "Piecewise functions",
+        question:
+          "A piecewise function has a jump discontinuity at x=c. Can it be differentiable at x=c?",
+        options: [
+          {
+            text:
+              "Yes, if the slopes of the two branches are equal.",
+            correct: false
+          },
+          {
+            text:
+              "Yes, if c=0.",
+            correct: false
+          },
+          {
+            text:
+              "No, because differentiability implies continuity.",
+            correct: true
+          },
+          {
+            text:
+              "Only when both branches are straight lines.",
+            correct: false
+          }
+        ],
+        explanation:
+          "A differentiable function must be continuous at the point. Therefore, a jump prevents differentiability."
+      },
+      {
+        topic: "Interpretation",
+        question:
+          "If s(t) gives the position of an object, what does s′(t₀) represent?",
+        options: [
+          {
+            text:
+              "The average position from 0 to t₀",
+            correct: false
+          },
+          {
+            text:
+              "The instantaneous velocity at time t₀",
+            correct: true
+          },
+          {
+            text:
+              "The total distance travelled",
+            correct: false
+          },
+          {
+            text:
+              "The acceleration at time t₀",
+            correct: false
+          }
+        ],
+        explanation:
+          "The derivative of position with respect to time is instantaneous velocity."
+      },
+      {
+        topic: "Derivative graph",
+        question:
+          "If f(x)=x³, which function is its derivative?",
+        options: [
+          {
+            text: "f′(x)=x²",
+            correct: false
+          },
+          {
+            text: "f′(x)=2x",
+            correct: false
+          },
+          {
+            text: "f′(x)=3x²",
+            correct: true
+          },
+          {
+            text: "f′(x)=3x",
+            correct: false
+          }
+        ],
+        explanation:
+          "By the power rule, d(x³)/dx = 3x²."
+      },
+      {
+        topic: "One-sided limits",
+        question:
+          "If h&lt;0 in f(a+h), from which side does a+h approach a?",
+        options: [
+          {
+            text: "From the left",
+            correct: true
+          },
+          {
+            text: "From the right",
+            correct: false
+          },
+          {
+            text: "Only vertically",
+            correct: false
+          },
+          {
+            text: "It does not approach a",
+            correct: false
+          }
+        ],
+        explanation:
+          "When h is negative, a+h is less than a, so the point approaches from the left."
+      },
+      {
+        topic: "Tangent line",
+        question:
+          "Which is the equation of the tangent line to y=f(x) at x=a?",
+        options: [
+          {
+            text:
+              "y−f(a)=f′(a)(x−a)",
+            correct: true
+          },
+          {
+            text:
+              "y−a=f(a)(x−f′(a))",
+            correct: false
+          },
+          {
+            text:
+              "y=f′(a)+x−a",
+            correct: false
+          },
+          {
+            text:
+              "y−f′(a)=f(a)(x−a)",
+            correct: false
+          }
+        ],
+        explanation:
+          "The tangent passes through (a,f(a)) and has slope f′(a), giving the point-slope equation."
+      }
+    ];
+
+    const quizState = {
+      questions: [],
+      index: 0
+    };
+
+    function shuffledCopy(array) {
+      const result = [...array];
+
+      for (let i = result.length - 1; i > 0; i--) {
+        const j =
+          Math.floor(Math.random() * (i + 1));
+
+        [result[i], result[j]] =
+          [result[j], result[i]];
+      }
+
+      return result;
+    }
+
+    function quizQuestionCorrect(question) {
+      return (
+        question.checked &&
+        question.selected !== null &&
+        question.options[question.selected].correct
+      );
+    }
+
+    function startNewQuiz() {
+      quizState.questions =
+        shuffledCopy(QUIZ_BANK)
+          .slice(0, 10)
+          .map(question => ({
+            ...question,
+            options: shuffledCopy(question.options),
+            selected: null,
+            checked: false
+          }));
+
+      quizState.index = 0;
+
+      renderQuiz();
+    }
+
+    function renderQuizSidebar() {
+      const total = quizState.questions.length;
+
+      const answered =
+        quizState.questions.filter(
+          question => question.checked
+        ).length;
+
+      const correct =
+        quizState.questions.filter(
+          quizQuestionCorrect
+        ).length;
+
+      byId("quizScore").textContent =
+        `${correct} / ${total}`;
+
+      byId("quizProgressText").textContent =
+        `${answered} of ${total} questions completed`;
+
+      const progress =
+        total ? (answered / total) * 100 : 0;
+
+      byId("quizProgressBar").style.width =
+        `${progress}%`;
+
+      const topicMap = new Map();
+
+      for (const question of quizState.questions) {
+        if (!question.checked) continue;
+
+        if (!topicMap.has(question.topic)) {
+          topicMap.set(question.topic, {
+            correct: 0,
+            total: 0
+          });
+        }
+
+        const topic = topicMap.get(question.topic);
+
+        topic.total++;
+
+        if (quizQuestionCorrect(question)) {
+          topic.correct++;
+        }
+      }
+
+      if (!topicMap.size) {
+        byId("quizTopicSummary").innerHTML = `
+          <div class="small-note">
+            Topic results will appear after you answer questions.
+          </div>
+        `;
+
+        return;
+      }
+
+      byId("quizTopicSummary").innerHTML =
+        [...topicMap.entries()]
+          .map(([topic, result]) => `
+            <div class="topic-row">
+              <span>${escapeHTML(topic)}</span>
+              <strong>
+                ${result.correct}/${result.total}
+              </strong>
+            </div>
+          `)
+          .join("");
+    }
+
+    function renderQuizFinal() {
+      const total = quizState.questions.length;
+
+      const correct =
+        quizState.questions.filter(
+          quizQuestionCorrect
+        ).length;
+
+      const percentage =
+        total ? Math.round((correct / total) * 100) : 0;
+
+      let heading;
+      let message;
+
+      if (percentage >= 90) {
+        heading = "Excellent work";
+        message =
+          "You have demonstrated a very strong understanding of the first principle and differentiability.";
+      } else if (percentage >= 70) {
+        heading = "Good progress";
+        message =
+          "Your understanding is generally secure. Review the explanations for the questions you missed.";
+      } else if (percentage >= 50) {
+        heading = "Developing understanding";
+        message =
+          "Review the secant-to-tangent process and compare left-hand and right-hand derivatives again.";
+      } else {
+        heading = "Further review recommended";
+        message =
+          "Return to Tasks 1–3, experiment with the graphs, and then attempt another randomized test.";
+      }
+
+      byId("quizMain").innerHTML = `
+        <div class="quiz-final">
+          <div>
+            <div class="quiz-final-score">
+              ${percentage}%
+            </div>
+
+            <h3>${heading}</h3>
+
+            <p>
+              You answered ${correct} out of ${total}
+              questions correctly. ${message}
+            </p>
+
+            <button
+              id="quizNewTest"
+              type="button"
+              class="action-button"
+            >
+              Try another randomized test
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderQuiz() {
+      renderQuizSidebar();
+
+      if (
+        quizState.index >= quizState.questions.length
+      ) {
+        renderQuizFinal();
+        return;
+      }
+
+      const question =
+        quizState.questions[quizState.index];
+
+      const optionMarkup =
+        question.options.map((option, index) => {
+          const selected =
+            question.selected === index;
+
+          let classes = "quiz-option";
+
+          if (selected) {
+            classes += " selected";
+          }
+
+          if (question.checked && option.correct) {
+            classes += " correct";
+          }
+
+          if (
+            question.checked &&
+            selected &&
+            !option.correct
+          ) {
+            classes += " wrong";
+          }
+
+          const letter =
+            String.fromCharCode(65 + index);
+
+          return `
+            <button
+              type="button"
+              class="${classes}"
+              data-option="${index}"
+              aria-pressed="${selected}"
+              ${question.checked ? "disabled" : ""}
+            >
+              <span class="option-letter">${letter}</span>
+              <span>${option.text}</span>
+            </button>
+          `;
+        }).join("");
+
+      let feedback = "";
+
+      if (question.checked) {
+        const correct =
+          quizQuestionCorrect(question);
+
+        feedback = `
+          <div class="quiz-feedback ${correct ? "good" : "warn"}">
+            <strong>
+              ${correct ? "Correct." : "Not quite."}
+            </strong>
+
+            ${question.explanation}
+          </div>
+        `;
+      }
+
+      byId("quizMain").innerHTML = `
+        <div class="quiz-meta">
+          <span class="quiz-topic">
+            ${escapeHTML(question.topic)}
+          </span>
+
+          <span class="quiz-question-number">
+            Question ${quizState.index + 1}
+            of ${quizState.questions.length}
+          </span>
+        </div>
+
+        <div class="quiz-question">
+          ${question.question}
+        </div>
+
+        <div class="quiz-options">
+          ${optionMarkup}
+        </div>
+
+        ${feedback}
+
+        <div class="quiz-actions">
+          ${
+            !question.checked
+              ? `
+                <button
+                  id="quizCheck"
+                  type="button"
+                  class="action-button"
+                  ${question.selected === null ? "disabled" : ""}
+                >
+                  Check answer
+                </button>
+              `
+              : `
+                <button
+                  id="quizNext"
+                  type="button"
+                  class="action-button"
+                >
+                  ${
+                    quizState.index ===
+                    quizState.questions.length - 1
+                      ? "View result"
+                      : "Next question"
+                  }
+                </button>
+              `
+          }
+        </div>
+      `;
+    }
+
+    byId("quizMain").addEventListener("click", event => {
+      const question =
+        quizState.questions[quizState.index];
+
+      const optionButton =
+        event.target.closest("button[data-option]");
+
+      if (
+        optionButton &&
+        question &&
+        !question.checked
+      ) {
+        question.selected =
+          Number(optionButton.dataset.option);
+
+        renderQuiz();
+        return;
+      }
+
+      if (
+        event.target.closest("#quizCheck") &&
+        question &&
+        question.selected !== null
+      ) {
+        question.checked = true;
+        renderQuiz();
+        return;
+      }
+
+      if (event.target.closest("#quizNext")) {
+        quizState.index++;
+        renderQuiz();
+        return;
+      }
+
+      if (event.target.closest("#quizNewTest")) {
+        startNewQuiz();
+      }
+    });
+
+    byId("quizRestart").addEventListener(
+      "click",
+      startNewQuiz
     );
 
     /* ============================================================
@@ -4220,23 +6988,40 @@
     ============================================================ */
 
     function activateTask(taskId) {
-      for (const tab of document.querySelectorAll(".task-tab")) {
-        const selected = tab.dataset.target === taskId;
+      for (
+        const tab of
+        document.querySelectorAll(".task-tab")
+      ) {
+        const selected =
+          tab.dataset.target === taskId;
 
         tab.classList.toggle("active", selected);
-        tab.setAttribute("aria-selected", String(selected));
+        tab.setAttribute(
+          "aria-selected",
+          String(selected)
+        );
       }
 
-      for (const panel of document.querySelectorAll(".task-panel")) {
-        panel.classList.toggle("active", panel.id === taskId);
+      for (
+        const panel of
+        document.querySelectorAll(".task-panel")
+      ) {
+        panel.classList.toggle(
+          "active",
+          panel.id === taskId
+        );
       }
 
       if (taskId === "task1") renderTask1();
       if (taskId === "task2") renderTask2();
       if (taskId === "task3") renderTask3();
+      if (taskId === "task4") renderQuiz();
     }
 
-    for (const tab of document.querySelectorAll(".task-tab")) {
+    for (
+      const tab of
+      document.querySelectorAll(".task-tab")
+    ) {
       tab.addEventListener("click", () => {
         activateTask(tab.dataset.target);
       });
@@ -4246,13 +7031,24 @@
        INITIALISE PAGE
     ============================================================ */
 
-    byId("t1Function").value = task1State.functionId;
-    byId("t2Function").value = task2State.functionId;
-    byId("t3Piece").value = task3State.pieceId;
+    byId("t1Function").value =
+      task1State.functionId;
+
+    byId("t2Function").value =
+      task2State.functionId;
+
+    byId("t3Piece").value =
+      task3State.pieceId;
+
+    applyTask3Functions({
+      announce: false,
+      render: false
+    });
 
     resetTask1();
     resetTask2();
     resetTask3();
+    startNewQuiz();
   </script>
 </body>
 </html>
